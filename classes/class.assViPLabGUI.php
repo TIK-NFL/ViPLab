@@ -34,11 +34,103 @@ class assViPLabGUI extends assQuestionGUI
 		{
 			$this->object->loadFromDb($a_id);
 		}
-		$this->vplugin = ilViPLabPlugin::getInstance();
+		$this->vplugin = ilassViPLabPlugin::getInstance();
 	}
 	
 	/**
-	 * @return ilViPLabPlugin
+	 * Get question tabs
+	 */
+	public function setQuestionTabs()
+	{
+		global $ilAccess, $ilTabs;
+		
+		$this->ctrl->setParameterByClass("ilAssQuestionPageGUI", "q_id", $_GET["q_id"]);
+		include_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
+		$q_type = $this->object->getQuestionType();
+
+		if (strlen($q_type))
+		{
+			$classname = $q_type . "GUI";
+			$this->ctrl->setParameterByClass(strtolower($classname), "sel_question_types", $q_type);
+			$this->ctrl->setParameterByClass(strtolower($classname), "q_id", $_GET["q_id"]);
+		}
+
+		if ($_GET["q_id"])
+		{
+			if ($ilAccess->checkAccess('write', '',$_GET["ref_id"]))
+			{
+				// edit page
+				$ilTabs->addTarget("edit_content",
+					$this->ctrl->getLinkTargetByClass("ilAssQuestionPageGUI", "edit"),
+					array("edit", "insert", "exec_pg"),
+					"", "");
+			}
+	
+			// preview page
+            $ilTabs->addTarget("preview",
+          	$this->ctrl->getLinkTargetByClass("ilAssQuestionPageGUI", "preview"),
+                array("preview"),
+                "ilAssQuestionPageGUI", "");
+         }
+
+		$force_active = false;
+		if ($ilAccess->checkAccess('write', '', $_GET["ref_id"]))
+		{
+			$url = "";
+			if ($classname) 
+			{
+				$url = $this->ctrl->getLinkTargetByClass($classname, "editQuestion");
+			}
+			$commands = $_POST["cmd"];
+			if (is_array($commands))
+			{
+				foreach ($commands as $key => $value)
+				{
+					if (preg_match("/^suggestrange_.*/", $key, $matches))
+					{
+						$force_active = true;
+					}
+				}
+			}
+			// edit question properties
+			$ilTabs->addTarget("edit_properties",
+				$url,
+				array("editQuestion", "save", "cancel", "addSuggestedSolution",
+					"cancelExplorer", "linkChilds", "removeSuggestedSolution",
+					"parseQuestion", "saveEdit", "suggestRange"),
+				$classname, "", $force_active);
+		}
+
+        // add tab for question feedback within common class assQuestionGUI
+        $this->addTab_QuestionFeedback($ilTabs);
+
+        // add tab for question hint within common class assQuestionGUI
+        $this->addTab_QuestionHints($ilTabs);
+
+		// Assessment of questions sub menu entry
+		if ($_GET["q_id"])
+		{
+			$ilTabs->addTarget("statistics",
+				$this->ctrl->getLinkTargetByClass($classname, "assessment"),
+				array("assessment"),
+				$classname, "");
+		}
+		
+		if (($_GET["calling_test"] > 0) || ($_GET["test_ref_id"] > 0))
+		{
+			$ref_id = $_GET["calling_test"];
+			if (strlen($ref_id) == 0) $ref_id = $_GET["test_ref_id"];
+			$ilTabs->setBackTarget($this->lng->txt("backtocallingtest"), "ilias.php?baseClass=ilObjTestGUI&cmd=questions&ref_id=$ref_id");
+		}
+		else
+		{
+			$ilTabs->setBackTarget($this->lng->txt("qpl"), $this->ctrl->getLinkTargetByClass("ilobjquestionpoolgui", "questions"));
+		}
+		
+	}
+	
+	/**
+	 * @return ilassViPLabPlugin
 	 */
 	protected function getPlugin()
 	{
@@ -596,7 +688,7 @@ class assViPLabGUI extends assQuestionGUI
 		$this->addSubParticipant();
 		$this->createExercise();
 
-		$atpl = ilViPLabPlugin::getInstance()->getTemplate('tpl.applet_question.html');
+		$atpl = ilassViPLabPlugin::getInstance()->getTemplate('tpl.applet_question.html');
 		
 		$atpl->setVariable('QUESTIONTEXT', $this->getViPLabQuestion()->prepareTextareaOutput($this->getViPLabQuestion()->getQuestion(), TRUE));
 		$atpl->setVariable('VIP_APPLET_URL',$this->getPlugin()->getDirectory().'/templates/applet/StudentApplet.jar');

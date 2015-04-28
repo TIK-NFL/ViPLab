@@ -23,7 +23,7 @@ class ilViPLabConfigGUI extends ilPluginConfigGUI
 
 		$ilTabs->addTab(
 			'settings',
-			ilViPLabPlugin::getInstance()->txt('tab_settings'),
+			ilassViPLabPlugin::getInstance()->txt('tab_settings'),
 			$GLOBALS['ilCtrl']->getLinkTarget($this,'configure')
 		);
 

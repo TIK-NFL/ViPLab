@@ -8,12 +8,12 @@ include_once "./Modules/TestQuestionPool/classes/class.ilQuestionsPlugin.php";
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
  * @version $Id$
  */
-class ilViPLabPlugin extends ilQuestionsPlugin
+class ilassViPLabPlugin extends ilQuestionsPlugin
 {
 	const CTYPE = 'Modules';
 	const CNAME = 'TestQuestionPool';
 	const SLOT_ID = 'qst';
-	const PNAME = 'ViPLab';
+	const PNAME = 'assViPLab';
 
 	private static $instance = null;
 	
