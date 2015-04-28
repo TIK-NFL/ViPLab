@@ -1,0 +1,11 @@
+--- classes/ecs/class.ilECSEvaluationConnector.php	(Revision 55848)
++++ classes/ecs/class.ilECSEvaluationConnector.php	(Arbeitskopie)
+@@ -10,7 +10,7 @@
+  */
+ class ilECSEvaluationConnector extends ilECSConnector
+ {
+-	const RESOURCE_PATH = '/numlab/evaluation';
++	const RESOURCE_PATH = '/numlab/evaluations';
+ 	
+ 	/**
+ 	 * Constructor

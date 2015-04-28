@@ -1,0 +1,22 @@
+viplab_qst_type#:#ViPLab Frage
+tab_settings#:#ViPLab-Einstellungen
+form_tab_settings#:#Einstellungen zum ViPLab-Fragen Plugin
+form_tab_settings_activate#:#Fragen-Plugin aktivieren
+form_tab_settings_ecs_server#:#ECS-Server
+form_tab_settings_ecs_server_info#:#Bitte wählen sie einen ECS-Server aus, der für die Synchronisation der Fragen und Antworten genutzt werden soll.
+form_tab_settings_editor#:#Editor-Maße
+form_tab_settings_editor_width#:#Breite
+form_tab_settings_editor_height#:#Höhe
+plang_C#:#C
+plang_C++#:#C++
+plang_Java#:#Java
+plang_DuMux#:#DuMux
+plang_Matlab#:#Matlab
+plang_Octave#:#Octave
+form_tab_settings_section_languages#:#Zuordnung der Programmiersprachen
+editor_lang#:#Programmiersprache
+ecs_mid#:#Mid
+editor#:#Fragen-Editor
+editor_start#:#Starte Editor
+store_results#:#Speichern der Rechenergebnisse
+store_results_info#:#Wenn aktiviert, werden die Ergebnisse der Lösungen gespeichert, um sie bei der manuellen Bewertung nicht neu berechnen zu müssen.

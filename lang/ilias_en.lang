@@ -1,0 +1,22 @@
+viplab_qst_type#:#ViPLab Question
+tab_settings#:#ViPLab-Settings
+form_tab_settings#:#Settings for the ViPLab-Question-Plugin
+form_tab_settings_activate#:#Activate Question-Plugin
+form_tab_settings_ecs_server#:#ECS-Server
+form_tab_settings_ecs_server_info#:#Please choose one ECS-Server, which is used for the synchronisation of questions
+form_tab_settings_editor#:#Editor Dimensions
+form_tab_settings_editor_width#:#Width
+form_tab_settings_editor_height#:#Height
+plang_C#:#C
+plang_C++#:#C++
+plang_Java#:#Java
+plang_DuMux#:#DuMux
+plang_Matlab#:#Matlab
+plang_Octave#:#Octave
+form_tab_settings_section_languages#:#Assignment of Programming Languages
+editor_lang#:#Programming Language
+ecs_mid#:#Mid
+editor#:#Question Editor
+editor_start#:#Start Editor
+store_results#:#Save Solution Output
+store_results_info#:#If enabled, the output of the solution calculation will be stored.
