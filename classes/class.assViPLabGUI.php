@@ -513,7 +513,8 @@ class assViPLabGUI extends assQuestionGUI
 
 	protected function addSubParticipant()
 	{
-		if(!$this->getViPLabQuestion()->getVipSubId())
+		if(TRUE)
+		#if(!$this->getViPLabQuestion()->getVipSubId())
 		{
 			$sub = new ilECSSubParticipant();
 			$com = ilViPLabUtil::lookupCommunityByMid(
@@ -688,6 +689,10 @@ class assViPLabGUI extends assQuestionGUI
 		$this->addSubParticipant();
 		$this->createExercise();
 
+		
+		$GLOBALS['ilLog']->write(__METHOD__.':************************************************ '.$this->getViPLabQuestion()->getVipCookie());
+		
+		
 		$atpl = ilassViPLabPlugin::getInstance()->getTemplate('tpl.applet_question.html');
 		
 		$atpl->setVariable('QUESTIONTEXT', $this->getViPLabQuestion()->prepareTextareaOutput($this->getViPLabQuestion()->getQuestion(), TRUE));
