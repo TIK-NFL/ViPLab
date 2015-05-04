@@ -11,7 +11,7 @@ include_once './Services/Component/classes/class.ilPluginConfigGUI.php';
  *
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
  */
-class ilViPLabConfigGUI extends ilPluginConfigGUI
+class ilassViPLabConfigGUI extends ilPluginConfigGUI
 {
 
 	/**

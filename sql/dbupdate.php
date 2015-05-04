@@ -132,3 +132,6 @@ if(!$ilDB->tableColumnExists('il_qpl_qst_viplab','vip_result_storage'))
 		);
 }
 ?>
+<#7>
+<?php
+?>
