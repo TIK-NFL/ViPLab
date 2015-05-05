@@ -68,11 +68,11 @@ class assViPLab extends assQuestion
 	)
 	{
 		parent::__construct($title, $comment, $author, $owner, $question);
-		$this->plugin = ilViPLabPlugin::getInstance();
+		$this->plugin = ilassViPLabPlugin::getInstance();
 	}
 	
 	/**
-	 * @return ilViPLabPlugin The plugin object
+	 * @return ilassViPLabPlugin The plugin object
 	 */
 	public function getPlugin() 
 	{

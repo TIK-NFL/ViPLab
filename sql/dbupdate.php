@@ -22,60 +22,63 @@
 ?>
 <#3>
 <?php
-$ilDB->createTable('il_qpl_qst_viplab',
-	array(
-		'question_fi'	=>	
-			array(
-				'type'		=> 'integer',
-				'length'	=> 4,
-				'default'	=> 0,
-				'notnull'	=> true
-			),
-		'vip_sub_id'	=>
-			array(
-				'type'		=> 'integer',
-				'length'	=> 4,
-				'default'	=> 0,
-				'notnull'	=> true
-			),
-		'vip_cookie'	=>
-			array(
-				'type'		=> 'text',
-				'length'	=> 128,
-				'default'	=> null,
-				'notnull'	=> false
-			),
-		'vip_width'	=>
-			array(
-				'type'		=> 'integer',
-				'length'	=> 4,
-				'default'	=> 0,
-				'notnull'	=> true
-			),
-		'vip_height'	=>
-			array(
-				'type'		=> 'integer',
-				'length'	=> 4,
-				'default'	=> 0,
-				'notnull'	=> true
-			),
-		'vip_lang'	=>
-			array(
-				'type'		=> 'text',
-				'length'	=> 16,
-				'default'	=> '',
-				'notnull'	=> false
-			),
-		'vip_exercise'	=>
-			array(
-				'type'		=> 'clob',
-				'default'	=> '',
-				'notnull'	=> false
-			)
-	)
-);
+if(!$ilDB->tableExists('il_qpl_qst_viplab'))
+{
+	$ilDB->createTable('il_qpl_qst_viplab',
+		array(
+			'question_fi'	=>	
+				array(
+					'type'		=> 'integer',
+					'length'	=> 4,
+					'default'	=> 0,
+					'notnull'	=> true
+				),
+			'vip_sub_id'	=>
+				array(
+					'type'		=> 'integer',
+					'length'	=> 4,
+					'default'	=> 0,
+					'notnull'	=> true
+				),
+			'vip_cookie'	=>
+				array(
+					'type'		=> 'text',
+					'length'	=> 128,
+					'default'	=> null,
+					'notnull'	=> false
+				),
+			'vip_width'	=>
+				array(
+					'type'		=> 'integer',
+					'length'	=> 4,
+					'default'	=> 0,
+					'notnull'	=> true
+				),
+			'vip_height'	=>
+				array(
+					'type'		=> 'integer',
+					'length'	=> 4,
+					'default'	=> 0,
+					'notnull'	=> true
+				),
+			'vip_lang'	=>
+				array(
+					'type'		=> 'text',
+					'length'	=> 16,
+					'default'	=> '',
+					'notnull'	=> false
+				),
+			'vip_exercise'	=>
+				array(
+					'type'		=> 'clob',
+					'default'	=> '',
+					'notnull'	=> false
+				)
+		)
+	);
 
-$ilDB->addPrimaryKey('il_qpl_qst_viplab', array('question_fi'));
+	$ilDB->addPrimaryKey('il_qpl_qst_viplab', array('question_fi'));
+}
 ?>
 
 <#4>
@@ -128,4 +131,7 @@ if(!$ilDB->tableColumnExists('il_qpl_qst_viplab','vip_result_storage'))
 			)
 		);
 }
+?>
+<#7>
+<?php
 ?>
