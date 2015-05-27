@@ -333,7 +333,7 @@ class assViPLab extends assQuestion
         // copy XHTML media objects
         $clone->copyXHTMLMediaObjectsOfQuestion($this_id);
 
-        $clone->onDuplicate($this->getObjId(), $this_id, $clone->getObjId(), $clone->getId());
+        $clone->onDuplicate($a_test_obj_id, $this_id, $clone->getObjId(), $clone->getId());
 
 		return $clone->id;
 	}
