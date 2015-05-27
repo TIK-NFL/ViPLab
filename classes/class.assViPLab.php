@@ -291,7 +291,7 @@ class assViPLab extends assQuestion
 	 *
 	 * @access public
 	 */
-	public function duplicate($for_test = true, $title = "", $author = "", $owner = "")
+	public function duplicate($for_test = true, $title = "", $author = "", $owner = "", $a_test_obj_id = null)
 	{
 		if ($this->id <= 0)
 		{
