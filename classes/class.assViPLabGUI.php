@@ -653,7 +653,7 @@ class assViPLabGUI extends assQuestionGUI
 	}
 
 	// preview 
-	public function getPreview($a_show_question_only = FALSE)
+	public function getPreview($a_show_question_only = FALSE, $showInlineFeedback = FALSE)
 	{
 		include_once './Services/UICore/classes/class.ilTemplate.php';
 		$template = $this->getPlugin()->getTemplate('tpl.il_as_viplab_preview.html');
