@@ -86,7 +86,10 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 		}
 			
 		$class_file = $this->getClassesDirectory().'/ecs/class.'.$a_classname.'.php';
-		include_once($class_file);
+		if(@include_once($class_file))
+		{
+			return;
+		}
 	}
 		
 }
