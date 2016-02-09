@@ -69,6 +69,13 @@ class ilECSSolutionConnector extends ilECSConnector
 			$ilLog->write(__METHOD__.': ... got HTTP 201 (created)');			
 
 			$eid =  self::_fetchEContentIdFromHeader($this->curl->getResponseHeaderArray());
+			
+			// store new ressource
+			$ressource = new ilECSViPLabRessource();
+			$ressource->setRessourceId($eid);
+			$ressource->setRessourceType(ilECSViPLabRessource::RES_SOLUTION);
+			$ressource->create();
+			
 			return $eid;
 	 	}
 	 	catch(ilCurlConnectionException $exc)

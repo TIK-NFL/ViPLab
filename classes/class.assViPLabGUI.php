@@ -360,6 +360,9 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	protected function initEditor()
 	{
+		ilECSViPLabRessources::deleteDeprecated();
+		
+		
 		$form = $this->initQuestionForm();
 		
 		if(!$form->checkInput())

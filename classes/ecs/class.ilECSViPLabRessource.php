@@ -10,6 +10,9 @@
 class ilECSViPLabRessource 
 {
 	const RES_SUBPARTICIPANT = 'subparticipant';
+	const RES_EXERCISE = 'exercise';
+	const RES_EVALUATION = 'evaluation';
+	const RES_SOLUTION = 'solution';
     
 	private $creation_time;
 	private $ressource_type;
@@ -37,7 +40,7 @@ class ilECSViPLabRessource
 	 */
 	public function setRessourceType($a_type)
 	{
-		$this->ressource_tpye = $a_type;
+		$this->ressource_type = $a_type;
 	}
 	
 	public function getRessourceType()
@@ -69,7 +72,7 @@ class ilECSViPLabRessource
 	 */
 	protected function getDB()
 	{
-		
+		return $this->db;
 	}
 	
 	/**
@@ -85,7 +88,7 @@ class ilECSViPLabRessource
 				$this->getDB()->quote($this->getRessourceType(),'text').', '.
 				$this->getDB()->quote(time(), 'integer').' '.
 				') ';
-		$this->getDB->manipulate($query);
+		$this->getDB()->manipulate($query);
 		$this->id = $new_id;
 		
 		return true;

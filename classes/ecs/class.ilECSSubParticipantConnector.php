@@ -71,8 +71,6 @@ class ilECSSubParticipantConnector extends ilECSConnector
 			$ressource->setRessourceType(ilECSViPLabRessource::RES_SUBPARTICIPANT);
 			$ressource->create();
 			
-			
-			#$ilLog->write(__METHOD__.': ... got cookie: '.$result->getCookie());
 			return $result;
 	 	}
 	 	catch(ilCurlConnectionException $exc)

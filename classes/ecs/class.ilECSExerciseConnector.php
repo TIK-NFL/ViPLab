@@ -69,6 +69,14 @@ class ilECSExerciseConnector extends ilECSConnector
 			$ilLog->write(__METHOD__.': ... got HTTP 201 (created)');			
 
 			$eid =  self::_fetchEContentIdFromHeader($this->curl->getResponseHeaderArray());
+			
+			// store new ressource
+			$ressource = new ilECSViPLabRessource();
+			$ressource->setRessourceId($eid);
+			$ressource->setRessourceType(ilECSViPLabRessource::RES_EXERCISE);
+			$ressource->create();
+			
+			
 			return $eid;
 	 	}
 	 	catch(ilCurlConnectionException $exc)
@@ -80,11 +88,11 @@ class ilECSExerciseConnector extends ilECSConnector
 	
 	/**
 	 * Delete sub participant
-	 * @param type $a_sub_id
+	 * @param int $a_exc_id
 	 */
 	public function deleteExercise($a_exc_id)
 	{
-		$GLOBALS['ilLog']->write(__METHOD__.': Delete exercise with id '. $a_exc_id);
+		ilLoggerFactory::getLogger('assviplab')->debug('Delete exercise with id '. $a_exc_id);
 	 	$this->path_postfix = self::RESOURCE_PATH;
 	 	
 	 	if($a_exc_id)
