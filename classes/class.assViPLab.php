@@ -433,7 +433,7 @@ class assViPLab extends assQuestion
 	 * @param boolean $returndetails (deprecated !!)
 	 * @access public
 	 */
-	function calculateReachedPoints($active_id, $pass = NULL, $returndetails = FALSE)
+	function calculateReachedPoints($active_id, $pass = NULL, $authorizedSolution = true, $returndetails = FALSE)
 	{
 		global $ilDB;
 		
@@ -465,7 +465,7 @@ class assViPLab extends assQuestion
 	 * @access public
 	 * @see $answers
 	 */
-	public function saveWorkingData($active_id, $pass = NULL)
+	public function saveWorkingData($active_id, $pass = NULL, $authorized = true)
 	{
 		global $ilDB;
 		
