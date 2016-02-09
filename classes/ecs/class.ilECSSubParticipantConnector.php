@@ -65,6 +65,13 @@ class ilECSSubParticipantConnector extends ilECSConnector
 			
 			$result = $this->parseResponse($ret);
 			
+			// store new ressource
+			$ressource = new ilECSViPLabRessource();
+			$ressource->setRessourceId($result->getMid());
+			$ressource->setRessourceType(ilECSViPLabRessource::RES_SUBPARTICIPANT);
+			$ressource->create();
+			
+			
 			#$ilLog->write(__METHOD__.': ... got cookie: '.$result->getCookie());
 			return $result;
 	 	}

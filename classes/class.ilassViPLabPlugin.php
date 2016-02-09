@@ -91,6 +91,5 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 			return;
 		}
 	}
-		
 }
 ?>

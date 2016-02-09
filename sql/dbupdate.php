@@ -134,4 +134,54 @@ if(!$ilDB->tableColumnExists('il_qpl_qst_viplab','vip_result_storage'))
 ?>
 <#7>
 <?php
+;
+?>
+
+<#8>
+<?php
+;
+?>
+
+<#9>
+<?php
+
+if(!$ilDB->tableExists('il_qpl_qst_viplab_res'))
+{
+	$ilDB->createTable('il_qpl_qst_viplab_res',
+		array(
+			'id'	=>	
+				array(
+					'type'		=> 'integer',
+					'length'	=> 4,
+					'default'	=> 0,
+					'notnull'	=> true
+				),
+			'res_id'	=>
+				array(
+					'type'		=> 'integer',
+					'length'	=> 4,
+					'default'	=> 0,
+					'notnull'	=> true
+				),
+			'ecs_res'	=>
+				array(
+					'type'		=> 'text',
+					'length'	=> 128,
+					'default'	=> null,
+					'notnull'	=> false
+				),
+			'create_dt'	=>
+				array(
+					'type'		=> 'integer',
+					'length'	=> 4,
+					'default'	=> 0,
+					'notnull'	=> true
+				)
+			)
+		);
+	
+	$ilDB->addPrimaryKey('il_qpl_qst_viplab_res', array('id'));
+	$ilDB->createSequence('il_qpl_qst_viplab_res');
+
+}
 ?>
