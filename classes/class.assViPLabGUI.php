@@ -669,30 +669,26 @@ class assViPLabGUI extends assQuestionGUI
 		}
 		return $preview;
 	}
-
+	
 	/**
-	 * Show question stuff
-	 * @param type $formaction
+	 * New implementation get testoutput
 	 * @param type $active_id
 	 * @param type $pass
-	 * @param type $is_postponed
-	 * @param type $use_post_solutions
-	 * @param type $show_feedback
+	 * @param type $is_question_postponed
+	 * @param type $user_post_solutions
+	 * @param type $show_specific_inline_feedback
+	 * @return type
 	 */
-	public function outQuestionForTest($formaction, $active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
+	public function getTestOutput($active_id, $pass, $is_question_postponed, $user_post_solutions, $show_specific_inline_feedback)
 	{
+
 		$GLOBALS['ilLog']->write(__METHOD__.' ##################### out question');
-		
-		
 		$settings = ilViPLabSettings::getInstance();
-		
 		$this->addSubParticipant();
 		$this->createExercise();
 
 		
 		$GLOBALS['ilLog']->write(__METHOD__.':************************************************ '.$this->getViPLabQuestion()->getVipCookie());
-		
-		
 		$atpl = ilassViPLabPlugin::getInstance()->getTemplate('tpl.applet_question.html');
 		
 		$atpl->setVariable('QUESTIONTEXT', $this->getViPLabQuestion()->prepareTextareaOutput($this->getViPLabQuestion()->getQuestion(), TRUE));
@@ -710,14 +706,10 @@ class assViPLabGUI extends assQuestionGUI
 		$atpl->setVariable('VIP_STORED_EXERCISE', $this->getViPLabQuestion()->getVipExerciseId());
 		$atpl->setVariable('VIP_STORED_PARTICIPANT',$this->getViPLabQuestion()->getVipSubId());
 		
-		$pageoutput = $this->outQuestionPage("", $is_postponed, $active_id, $atpl->get());
-
-		$this->tpl->setVariable('QUESTION_OUTPUT',$pageoutput);
-		$this->tpl->setVariable('FORMACTION',$formaction);
-		
 		$GLOBALS['tpl']->addJavaScript($this->getPlugin()->getDirectory().'/js/question_init.js');
+		return $atpl->get();
 	}
-
+	
 
 	/**
 	 * Show solution output
@@ -820,7 +812,7 @@ class assViPLabGUI extends assQuestionGUI
 	public function getSpecificFeedbackOutput($active_id, $pass)
 	{
 	}
-	
-	
+
+
 }
 ?>
