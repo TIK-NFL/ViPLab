@@ -31,7 +31,8 @@ class ilECSSolutionConnector extends ilECSConnector
 	{
 		global $ilLog;
 		
-		$ilLog->write(__METHOD__.': Add new solution resource for subparticipant: '.$a_receiver_com);
+		ilLoggerFactory::getLogger('viplab')->debug('Add new solution ressource for subparticipant: ' . $a_receiver_com);
+		ilLoggerFactory::getLogger('viplab')->debug(print_r($sol,true));
 
 	 	$this->path_postfix = self::RESOURCE_PATH;
 	 	
@@ -58,15 +59,15 @@ class ilECSSolutionConnector extends ilECSConnector
 			$ret = $this->call();
 			$info = $this->curl->getInfo(CURLINFO_HTTP_CODE);
 	
-			$ilLog->write(__METHOD__.': Checking HTTP status...');
+			ilLoggerFactory::getLogger('viplab')->debug('Checking HTTP status');
 			if($info != self::HTTP_CODE_CREATED)
 			{
-				$ilLog->write(__METHOD__.': Cannot create solution, did not receive HTTP 201. ');
-				$ilLog->write(__METHOD__.': '.print_r($ret,TRUE));
+				ilLoggerFactory::getLogger('viplab')->error('Cannot create solution, did not receive HTTP 201.');
+				ilLoggerFactory::getLogger('viplab')->info(print_r($ret, true));
 				
 				throw new ilECSConnectorException('Received HTTP status code: '.$info);
 			}
-			$ilLog->write(__METHOD__.': ... got HTTP 201 (created)');			
+			ilLoggerFactory::getLogger('viplab')->info('Received HTTP 201: created');
 
 			$eid =  self::_fetchEContentIdFromHeader($this->curl->getResponseHeaderArray());
 			
@@ -91,7 +92,7 @@ class ilECSSolutionConnector extends ilECSConnector
 	 */
 	public function deleteSolution($a_sol_id)
 	{
-		$GLOBALS['ilLog']->write(__METHOD__.': Delete solution with id '. $a_sol_id);
+		ilLoggerFactory::getLogger('viplab')->debug('Delete solution with id '. $a_sol_id);
 	 	$this->path_postfix = self::RESOURCE_PATH;
 	 	
 	 	if($a_sol_id)
