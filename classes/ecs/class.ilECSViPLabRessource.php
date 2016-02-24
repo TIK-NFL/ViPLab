@@ -36,6 +36,15 @@ class ilECSViPLabRessource
 	}
 	
 	/**
+	 * Get creation time
+	 * @return int
+	 */
+	public function getCreationDate()
+	{
+		return $this->creation_time;
+	}
+	
+	/**
 	 * Set ressource type
 	 */
 	public function setRessourceType($a_type)

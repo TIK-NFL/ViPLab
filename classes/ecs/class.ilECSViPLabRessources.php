@@ -11,6 +11,26 @@ class ilECSViPLabRessources
 {
 	const MAX_AGE_SECONDS = 3600;
 
+	/**
+	 * Get ressources
+	 * @return ilECSViPLabRessource[]
+	 */
+	public static function getRessources($a_age = null)
+	{
+		global $ilDB;
+		
+		$query = 'SELECT id from il_qpl_qst_viplab_res ' .
+				'WHERE create_dt < ' . $ilDB->quote(time() - self::MAX_AGE_SECONDS, 'integer');
+		$res = $ilDB->query($query);
+		
+		$ressources = array();
+		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		{
+			$ressources[] = new ilECSViPLabRessource($row->id);
+		}
+		return $ressources;
+	}
+
 	public static function deleteDeprecated()
 	{
 		global $ilDB;
