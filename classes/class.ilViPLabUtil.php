@@ -35,7 +35,7 @@ class ilViPLabUtil
 		}
 		catch (ilECSConnectorException $e)
 		{
-			$GLOBALS['ilLog']->write(__METHOD__.': Reading community failed with message '.$e->getMessage());
+			ilLoggerFactory::getLogger('viplab')->error('Reading community failed with message: ' . $e->getMessage());
 			return 0;
 		}
 	}

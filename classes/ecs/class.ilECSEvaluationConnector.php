@@ -29,9 +29,7 @@ class ilECSEvaluationConnector extends ilECSConnector
 	 */
 	public function addEvaluation($exercise, $a_receiver_com)
 	{
-		global $ilLog;
-		
-		$ilLog->write(__METHOD__.': Add new evalaution resource for subparticipant: '.$a_receiver_com);
+		ilLoggerFactory::getLogger('viplab')->debug('Add new evaluation ressource for subparticipant: ' . $a_receiver_com);
 
 	 	$this->path_postfix = self::RESOURCE_PATH;
 	 	
@@ -58,15 +56,14 @@ class ilECSEvaluationConnector extends ilECSConnector
 			$ret = $this->call();
 			$info = $this->curl->getInfo(CURLINFO_HTTP_CODE);
 	
-			$ilLog->write(__METHOD__.': Checking HTTP status...');
+			ilLoggerFactory::getLogger('viplab')->debug('Checking HTTP status...');
 			if($info != self::HTTP_CODE_CREATED)
 			{
-				$ilLog->write(__METHOD__.': Cannot create evaluation, did not receive HTTP 201. ');
-				$ilLog->write(__METHOD__.': '.print_r($ret,TRUE));
-				
+				ilLoggerFactory::getLogger('viplab')->error('Cannot create evaluation ressource, did not receive HTTP 201');
+				ilLoggerFactory::getLogger('viplab')->error('Return value: '. print_r($ret, true));
 				throw new ilECSConnectorException('Received HTTP status code: '.$info);
 			}
-			$ilLog->write(__METHOD__.': ... got HTTP 201 (created)');			
+			ilLoggerFactory::getLogger('viplab')->debug('... got HTTP 201 (created)');
 
 			$eid =  self::_fetchEContentIdFromHeader($this->curl->getResponseHeaderArray());
 			
@@ -88,11 +85,11 @@ class ilECSEvaluationConnector extends ilECSConnector
 	
 	/**
 	 * Delete sub participant
-	 * @param type $a_sub_id
+	 * @param type $a_exc_id
 	 */
 	public function deleteEvaluation($a_exc_id)
 	{
-		$GLOBALS['ilLog']->write(__METHOD__.': Delete evaluation with id '. $a_exc_id);
+		ilLoggerFactory::getLogger('viplab')->debug('Delete evaluation with id: '. $a_exc_id);
 	 	$this->path_postfix = self::RESOURCE_PATH;
 	 	
 	 	if($a_exc_id)

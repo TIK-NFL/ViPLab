@@ -23,9 +23,6 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	public function __construct($a_id = -1)
 	{
-		
-		$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($_REQUEST,TRUE));
-		
 		parent::__construct($a_id);
 		$this->object = new assViPLab();
 		$this->newUnitId = null;
@@ -469,7 +466,6 @@ class assViPLabGUI extends assQuestionGUI
 		{
 			$result_string = $result_arr[1]['value2'];
 		}
-		#$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($result_str,TRUE));
 		try 
 		{
 			$scon = new ilECSVipResultConnector(
@@ -561,7 +557,6 @@ class assViPLabGUI extends assQuestionGUI
 			// save cookie and sub_id
 			$this->getViPLabQuestion()->setVipSubId($res->getMid());
 			$this->getViPLabQuestion()->setVipCookie($res->getCookie());
-			#$GLOBALS['ilLog']->write(__METHOD__.': DEBUG '. print_r($res,TRUE));
 			ilLoggerFactory::getLogger('viplab')->debug('Recieved new cookie '. $res->getCookie());
 			ilLoggerFactory::getLogger('viplab')->debug('Recieved new  mid '. $res->getMid());
 		}		
@@ -641,7 +636,7 @@ class assViPLabGUI extends assQuestionGUI
 		$this->getViPLabQuestion()->setVipEvaluation($form->getInput('vipevaluation'));
 		$this->getViPLabQuestion()->setVipResultStorage($form->getInput('result_storing'));
 		
-		$GLOBALS['ilLog']->write(__METHOD__.': '.$form->getInput('vipexercise'));
+		ilLoggerFactory::getLogger('viplab')->debug(print_r($form->getInput('vipexercise'),true));
 		
 		$this->getViPLabQuestion()->setEstimatedWorkingTime(
 			$_POST["Estimated"]["hh"],
@@ -692,13 +687,12 @@ class assViPLabGUI extends assQuestionGUI
 	public function getTestOutput($active_id, $pass, $is_question_postponed, $user_post_solutions, $show_specific_inline_feedback)
 	{
 
-		$GLOBALS['ilLog']->write(__METHOD__.' ##################### out question');
 		$settings = ilViPLabSettings::getInstance();
 		$this->addSubParticipant();
 		$this->createExercise();
 
+		ilLoggerFactory::getLogger('viplab')->debug('VipCookie: '. $this->getViPLabQuestion()->getVipCookie());
 		
-		$GLOBALS['ilLog']->write(__METHOD__.':************************************************ '.$this->getViPLabQuestion()->getVipCookie());
 		$atpl = ilassViPLabPlugin::getInstance()->getTemplate('tpl.applet_question.html');
 		
 		$atpl->setVariable('QUESTIONTEXT', $this->getViPLabQuestion()->prepareTextareaOutput($this->getViPLabQuestion()->getQuestion(), TRUE));

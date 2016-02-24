@@ -29,7 +29,6 @@ class ilECSSolutionConnector extends ilECSConnector
 	 */
 	public function addSolution($sol, $a_receiver_com)
 	{
-		global $ilLog;
 		
 		ilLoggerFactory::getLogger('viplab')->debug('Add new solution ressource for subparticipant: ' . $a_receiver_com);
 		ilLoggerFactory::getLogger('viplab')->debug(print_r($sol,true));
