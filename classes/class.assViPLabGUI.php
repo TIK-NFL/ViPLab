@@ -658,6 +658,12 @@ class assViPLabGUI extends assQuestionGUI
 	}
 
 	// preview 
+	/**
+	 * Preview of question
+	 * @param type $a_show_question_only
+	 * @param type $showInlineFeedback
+	 * @return type
+	 */
 	public function getPreview($a_show_question_only = FALSE, $showInlineFeedback = FALSE)
 	{
 		include_once './Services/UICore/classes/class.ilTemplate.php';
@@ -666,12 +672,34 @@ class assViPLabGUI extends assQuestionGUI
 				$this->getViPLabQuestion()->prepareTextareaOutput(
 						$this->getViPLabQuestion()->getQuestion())
 		);
-		$preview = $template->get();
 		
-		if(!$a_show_question_only)
+		if($a_show_question_only)
 		{
-			$preview = $this->getILIASPage($preview);
+			$preview = $template->get();
+			return $template->get();
 		}
+		
+		$template->setCurrentBlock('complete');
+		
+		$settings = ilViPLabSettings::getInstance();
+		$this->addSubParticipant();
+		$this->createExercise();
+		
+		$template->setVariable('VIP_ID', $this->getViPLabQuestion()->getId());
+		$template->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
+		$template->setVariable('VIP_ECS_URL', 'https://'.ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServer());
+		$template->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
+		$template->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
+		$template->setVariable('INITJS',$this->getPlugin()->getDirectory().'/templates');
+		
+		$template->parseCurrentBlock();
+		
+		
+		$preview = $template->get();
+		$preview = $this->getILIASPage($preview);
+		
+		$GLOBALS['tpl']->addJavaScript($this->getPlugin()->getDirectory().'/js/question_init.js');
+		
 		return $preview;
 	}
 	
