@@ -21,6 +21,8 @@ class ilViPLabSettings
 	private $height = 600;
 	private $languages = array();
 	
+	private $log_level;
+	
 	
 	/**
 	 * Singeleton constructor
@@ -109,6 +111,16 @@ class ilViPLabSettings
 		return 0;
 	}
 	
+	public function getLogLevel()
+	{
+		return $this->log_level;
+	}
+	
+	public function setLogLevel($a_level)
+	{
+		$this->log_level = $a_level;
+	}
+	
 	/**
 	 * Update settings
 	 */
@@ -121,6 +133,7 @@ class ilViPLabSettings
 		
 		$ser_language = serialize($this->getLanguages());
 		$this->getStorage()->set('languages',$ser_language);
+		$this->getStorage()->set('log_level', $this->getLogLevel());
 	}
 	
 	/**
@@ -143,6 +156,7 @@ class ilViPLabSettings
 		$this->setWidth($this->getStorage()->get('width',$this->width));
 		$this->setHeight($this->getStorage()->get('height',$this->height));
 		$this->setLanguages(unserialize($this->getStorage()->get('languages',serialize($this->languages))));
+		$this->setLogLevel($this->getStorage()->get('log_level',$this->log_level));
 	}
 }
 ?>

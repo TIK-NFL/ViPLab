@@ -76,6 +76,12 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		$active->setChecked($settings->isActive());
 		$form->addItem($active);
 		
+		// log level
+		$GLOBALS['lng']->loadLanguageModule('log');
+		$level = new ilSelectInputGUI($this->getPluginObject()->txt('form_tab_settings_loglevel'),'log_level');
+		$level->setOptions(ilLogLevel::getLevelOptions());
+		$level->setValue($settings->getLogLevel());
+		$form->addItem($level);
 		
 		// ecs servers
 		include_once './Services/WebServices/ECS/classes/class.ilECSServerSettings.php';
@@ -206,6 +212,7 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 			$settings = ilViPLabSettings::getInstance();
 			
 			$settings->setActive($form->getInput('active'));
+			$settings->setLogLevel($form->getInput('log_level'));
 			$settings->setECSServer($form->getInput('ecs'));
 			$settings->setWidth($form->getInput('width'));
 			$settings->setHeight($form->getInput('height'));

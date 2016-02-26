@@ -4,7 +4,7 @@
 $id = "assviplab";
  
 // code version; must be changed for all code changes
-$version = "5.1.03";
+$version = "5.1.04";
  
 // ilias min and max version; must always reflect the versions that should
 // run with the plugin

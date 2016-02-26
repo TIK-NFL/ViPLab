@@ -20,3 +20,4 @@ editor#:#Fragen-Editor
 editor_start#:#Starte Editor
 store_results#:#Speichern der Rechenergebnisse
 store_results_info#:#Wenn aktiviert, werden die Ergebnisse der Lösungen gespeichert, um sie bei der manuellen Bewertung nicht neu berechnen zu müssen.
+form_tab_settings_loglevel#:#Log-Level

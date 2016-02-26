@@ -744,5 +744,4 @@ class assViPLab extends assQuestion
 		}
 	}
 }
-
 ?>
