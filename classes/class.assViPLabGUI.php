@@ -395,9 +395,17 @@ class assViPLabGUI extends assQuestionGUI
 	 * @param bool force solution generation even for empty solutions
 	 * @return int
 	 */
-	protected function createSolution($a_active_id, $a_pass, $a_force_empty_solution = true)
+	protected function createSolution($a_active_id, $a_pass = null, $a_force_empty_solution = true)
 	{
-		$sol_arr = $this->getViPLabQuestion()->getSolutionValues($a_active_id, $a_pass);
+		include_once "./Modules/Test/classes/class.ilObjTest.php";
+		if(!ilObjTest::_getUsePreviousAnswers($a_active_id, true))
+		{
+			if(is_null($a_pass))
+			{
+				$pass = ilObjTest::_getPass($a_active_id);
+			}
+		}
+		$sol_arr = $this->getViPLabQuestion()->getUserSolutionPreferingIntermediate($a_active_id, $a_pass);
 		
 		ilLoggerFactory::getLogger('viplab')->debug(print_r($sol_arr,true));
 		
