@@ -748,8 +748,10 @@ class assViPLabGUI extends assQuestionGUI
 			);
 		}
 		
+		$pageoutput = $this->outQuestionPage("", $is_question_postponed, $active_id, $atpl->get());
+		
 		$GLOBALS['tpl']->addJavaScript($this->getPlugin()->getDirectory().'/js/question_init.js');
-		return $atpl->get();
+		return $pageoutput;
 	}
 	
 
