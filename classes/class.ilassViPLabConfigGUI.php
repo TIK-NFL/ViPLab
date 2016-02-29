@@ -26,12 +26,13 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 			ilassViPLabPlugin::getInstance()->txt('tab_settings'),
 			$GLOBALS['ilCtrl']->getLinkTarget($this,'configure')
 		);
-		
+		/*
 		$ilTabs->addTab(
 			'tab_ecs_ressources',
 			ilassViPLabPlugin::getInstance()->txt('tab_ecs_ressources'),
 			$GLOBALS['ilCtrl']->getLinkTarget($this, 'listEcsRessources')
 		);
+		 */
 
 		switch ($cmd)
 		{
