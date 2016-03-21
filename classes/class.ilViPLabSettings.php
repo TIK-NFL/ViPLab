@@ -21,6 +21,8 @@ class ilViPLabSettings
 	private $height = 600;
 	private $languages = array();
 	
+	private $evaluation_mid = 0;
+	
 	private $log_level;
 	
 	
@@ -121,6 +123,16 @@ class ilViPLabSettings
 		$this->log_level = $a_level;
 	}
 	
+	public function setEvaluationMid($a_mid)
+	{
+		$this->evaluation_mid = $a_mid;
+	}
+	
+	public function getEvaluationMid()
+	{
+		return $this->evaluation_mid;
+	}
+	
 	/**
 	 * Update settings
 	 */
@@ -134,6 +146,7 @@ class ilViPLabSettings
 		$ser_language = serialize($this->getLanguages());
 		$this->getStorage()->set('languages',$ser_language);
 		$this->getStorage()->set('log_level', $this->getLogLevel());
+		$this->getStorage()->set('evaluation_mid', $this->getEvaluationMid());
 	}
 	
 	/**
@@ -157,6 +170,7 @@ class ilViPLabSettings
 		$this->setHeight($this->getStorage()->get('height',$this->height));
 		$this->setLanguages(unserialize($this->getStorage()->get('languages',serialize($this->languages))));
 		$this->setLogLevel($this->getStorage()->get('log_level',$this->log_level));
+		$this->setEvaluationMid($this->getStorage()->get('evaluation_mid'), $this->evaluation_mid);
 	}
 }
 ?>

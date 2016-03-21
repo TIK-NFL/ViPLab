@@ -329,7 +329,7 @@ class assViPLabGUI extends assQuestionGUI
 			$applet->setVariable('VIP_WIDTH',$settings->getWidth());
 			$applet->setVariable('VIP_HEIGHT',$settings->getHeight());
 			$applet->setVariable('VIP_APPLET',$this->getPlugin()->getDirectory().'/templates/applet/TeacherApplet.jar');
-			$applet->setVariable('VIP_ECS_URL', 'https://'.ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServer());
+			$applet->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
 			$applet->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 			$applet->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
 			$applet->setVariable('VIP_LANG',$this->getViPLabQuestion()->getVipLang());
@@ -695,7 +695,7 @@ class assViPLabGUI extends assQuestionGUI
 		
 		$template->setVariable('VIP_ID', $this->getViPLabQuestion()->getId());
 		$template->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
-		$template->setVariable('VIP_ECS_URL', 'https://'.ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServer());
+		$template->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
 		$template->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 		$template->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
 		$template->setVariable('INITJS',$this->getPlugin()->getDirectory().'/templates');
@@ -736,7 +736,7 @@ class assViPLabGUI extends assQuestionGUI
 		$atpl->setVariable('VIP_WIDTH',$settings->getWidth());
 		$atpl->setVariable('VIP_HEIGHT',$settings->getHeight());
 		$atpl->setVariable('VIP_APPLET',$this->getPlugin()->getDirectory().'/templates/applet/StudentApplet.jar');
-		$atpl->setVariable('VIP_ECS_URL', 'https://'.ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServer());
+		$atpl->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
 		$atpl->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 		$atpl->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
 		$atpl->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
@@ -815,11 +815,11 @@ class assViPLabGUI extends assQuestionGUI
 			$soltpl->setCurrentBlock('complete');
 			$soltpl->setVariable('VIP_APP_ID',$this->getViPLabQuestion()->getId());
 			$soltpl->setVariable('VIP_APPLET_URL',$this->getPlugin()->getDirectory().'/templates/applet/TeacherApplet.jar');
-			$soltpl->setVariable('VIP_ECS_URL', 'https://'.ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServer());
+			$soltpl->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
 			$soltpl->setVariable('VIP_WIDTH',$settings->getWidth());
 			$soltpl->setVariable('VIP_HEIGHT',$settings->getHeight());
 			$soltpl->setVariable('VIP_APPLET',$this->getPlugin()->getDirectory().'/templates/applet/TeacherApplet.jar');
-			$soltpl->setVariable('VIP_ECS_URL', 'https://'.ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServer());
+			$soltpl->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
 			$soltpl->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 			$soltpl->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
 			$soltpl->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());

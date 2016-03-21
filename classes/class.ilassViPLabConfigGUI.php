@@ -77,12 +77,6 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		$active->setChecked($settings->isActive());
 		$form->addItem($active);
 		
-		// log level
-		$GLOBALS['lng']->loadLanguageModule('log');
-		$level = new ilSelectInputGUI($this->getPluginObject()->txt('form_tab_settings_loglevel'),'log_level');
-		$level->setOptions(ilLogLevel::getLevelOptions());
-		$level->setValue($settings->getLogLevel());
-		$form->addItem($level);
 		
 		// ecs servers
 		include_once './Services/WebServices/ECS/classes/class.ilECSServerSettings.php';
@@ -118,6 +112,29 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		$editor->addSubItem($height);
 		$form->addItem($editor);
 		
+		// evaluation backend
+		$evaluation_backend = new ilSelectInputGUI($this->getPluginObject()->txt('form_tab_settings_eval_backend'),'evaluation_mid');
+		$evaluation_options = array();
+		if($settings->getECSServer())
+		{
+			$evaluation_options = $this->readAvailabeMids($settings);
+		}
+		else
+		{
+			$evaluation_backend->setDisabled(true);
+		}
+		$evaluation_backend->setOptions($evaluation_options);
+		$evaluation_backend->setValue($settings->getEvaluationMid());
+		$form->addItem($evaluation_backend);
+		
+		// log level
+		$GLOBALS['lng']->loadLanguageModule('log');
+		$level = new ilSelectInputGUI($this->getPluginObject()->txt('form_tab_settings_loglevel'),'log_level');
+		$level->setOptions(ilLogLevel::getLevelOptions());
+		$level->setValue($settings->getLogLevel());
+		$form->addItem($level);
+		
+
 		// languages
 		$section = new ilFormSectionHeaderGUI();
 		$section->setTitle($this->getPluginObject()->txt('form_tab_settings_section_languages'));
@@ -217,6 +234,7 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 			$settings->setECSServer($form->getInput('ecs'));
 			$settings->setWidth($form->getInput('width'));
 			$settings->setHeight($form->getInput('height'));
+			$settings->setEvaluationMid($form->getInput('evaluation_mid'));
 			
 			$this->getPluginObject()->includeClass('class.ilViPLabUtil.php');
 			
