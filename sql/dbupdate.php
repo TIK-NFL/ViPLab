@@ -185,3 +185,20 @@ if(!$ilDB->tableExists('il_qpl_qst_viplab_res'))
 
 }
 ?>
+<#10>
+<?php
+
+if(!$ilDB->tableColumnExists('il_qpl_qst_viplab','vip_auto_scoring'))
+{
+	$ilDB->addTableColumn(
+			'il_qpl_qst_viplab',
+			'vip_auto_scoring',
+			array(
+				'type'		=> 'integer',
+				'default'	=> 0,
+				'length'	=> 1,
+				'notnull'	=> true
+			)
+		);
+}
+?>

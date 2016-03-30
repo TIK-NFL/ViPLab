@@ -23,3 +23,5 @@ store_results_info#:#If enabled, the output of the solution calculation will be 
 form_tab_settings_loglevel#:#Log-Level
 form_tab_settings_eval_backend#:#Evaluation Backend
 form_tab_settings_eval_backend_info#:#Choose the backend for automatic evaluations.
+auto_scoring#:#Automatic Scoring
+auto_scoring_info#:#If enabled, an automatic scoring is triggered after the submission of solutions.

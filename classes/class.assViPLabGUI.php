@@ -291,6 +291,13 @@ class assViPLabGUI extends assQuestionGUI
 		$results->setValue(1);
 		$results->setChecked($this->getViPLabQuestion()->getVipResultStorage());
 		$form->addItem($results);
+		
+		$scoring = new ilCheckboxInputGUI($this->getPlugin()->txt('auto_scoring'),'auto_scoring');
+		$scoring->setInfo($this->getPlugin()->txt('auto_scoring_info'));
+		$scoring->setValue(1);
+		$scoring->setChecked($this->getViPLabQuestion()->getVipAutoScoring());
+		$form->addItem($scoring);
+		
 
 		if ($this->object->getId())
 		{
@@ -646,6 +653,7 @@ class assViPLabGUI extends assQuestionGUI
 		$this->getViPLabQuestion()->setVipExercise($form->getInput('vipexercise'));
 		$this->getViPLabQuestion()->setVipEvaluation($form->getInput('vipevaluation'));
 		$this->getViPLabQuestion()->setVipResultStorage($form->getInput('result_storing'));
+		$this->getViPLabQuestion()->setVipAutoScoring($form->getInput('auto_scoring'));
 		
 		ilLoggerFactory::getLogger('viplab')->debug(print_r($form->getInput('vipexercise'),true));
 		

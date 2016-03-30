@@ -42,6 +42,7 @@ class assViPLab extends assQuestion
 	private $vip_exercise = '';
 	private $vip_evaluation = '';
 	private $vip_exercise_id = 0;
+	private $vip_auto_scoring = false;
 
 	
 	private $plugin;
@@ -167,6 +168,16 @@ class assViPLab extends assQuestion
 	{
 		$this->vip_result_storage = $a_res;
 	}
+	
+	public function setVipAutoScoring($a_auto_scoring)
+	{
+		$this->vip_auto_scoring = $a_auto_scoring;
+	}		
+	
+	public function getVipAutoScoring()
+	{
+		return $this->vip_auto_scoring;
+	}
 
 	/**
 	 * Returns true, if a single choice question is complete for use
@@ -215,7 +226,8 @@ class assViPLab extends assQuestion
 					'vip_lang'		=> array('text', (string) $this->getVipLang()),
 					'vip_exercise_id'	=> array('integer',(string) $this->getVipExerciseId()),
 					'vip_evaluation' => array('clob',(string) $this->getVipEvaluation()),
-					'vip_result_storage' => array('integer',(string) $this->getVipResultStorage())
+					'vip_result_storage' => array('integer',(string) $this->getVipResultStorage()),
+					'vip_auto_scoring' => array('integer', (int) $this->getVipAutoScoring())
 				)
 		);
 		parent::saveToDb($original_id);
@@ -277,6 +289,7 @@ class assViPLab extends assQuestion
 				$this->setVipExerciseId((int) $data['vip_exercise_id']);
 				$this->setVipEvaluation((string) $data['vip_evaluation']);
 				$this->setVipResultStorage((int) $data['vip_result_storage']);
+				$this->setVipAutoScoring((int) $data['vip_auto_scoring']);
 			}
 		}
 		parent::loadFromDb($question_id);
