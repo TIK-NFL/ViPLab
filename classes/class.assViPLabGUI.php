@@ -397,6 +397,9 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	protected function createSolution($a_active_id, $a_pass = null, $a_force_empty_solution = true)
 	{
+		// always create solution
+		$a_force_empty_solution = true;
+		
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
 		if(!ilObjTest::_getUsePreviousAnswers($a_active_id, true))
 		{
@@ -730,6 +733,10 @@ class assViPLabGUI extends assQuestionGUI
 		ilLoggerFactory::getLogger('viplab')->debug('VipCookie: '. $this->getViPLabQuestion()->getVipCookie());
 		
 		$atpl = ilassViPLabPlugin::getInstance()->getTemplate('tpl.applet_question.html');
+
+		// What happens if has no solution, answers questions => and clicks "Calculate"?
+		$sol_id = $this->createSolution($active_id, $pass, false);
+
 		
 		$atpl->setVariable('QUESTIONTEXT', $this->getViPLabQuestion()->prepareTextareaOutput($this->getViPLabQuestion()->getQuestion(), TRUE));
 		$atpl->setVariable('VIP_APPLET_URL',$this->getPlugin()->getDirectory().'/templates/applet/StudentApplet.jar');
@@ -740,6 +747,13 @@ class assViPLabGUI extends assQuestionGUI
 		$atpl->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 		$atpl->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
 		$atpl->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
+		
+		if($sol_id)
+		{
+			$atpl->setVariable('VIP_SOLUTION', ilECSSolutionConnector::RESOURCE_PATH.'/'.$sol_id);
+		}
+		
+
 		$atpl->setVariable('INITJS',$this->getPlugin()->getDirectory().'/templates');
 		
 		
@@ -747,13 +761,9 @@ class assViPLabGUI extends assQuestionGUI
 		$atpl->setVariable('VIP_STORED_PARTICIPANT',$this->getViPLabQuestion()->getVipSubId());
 		
 		// add solution 
-		$sol_id = $this->createSolution($active_id, $pass, false);
 		if($sol_id)
 		{
-			$atpl->setVariable(
-					'VIP_STORED_SOLUTION',
-					ilECSSolutionConnector::RESOURCE_PATH.'/'.$sol_id
-			);
+			$atpl->setVariable('VIP_STORED_SOLUTION',$sol_id);
 		}
 		
 		$pageoutput = $this->outQuestionPage("", $is_question_postponed, $active_id, $atpl->get());
