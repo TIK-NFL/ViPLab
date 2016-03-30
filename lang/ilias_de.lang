@@ -23,3 +23,4 @@ store_results_info#:#Wenn aktiviert, werden die Ergebnisse der Lösungen gespeic
 form_tab_settings_loglevel#:#Log-Level
 form_tab_settings_eval_backend#:#Server für Auswertungen
 form_tab_settings_eval_backend_info#:#Bitte wählen sie den Server aus, der automatische Auswertungen durchführen soll.
+form_tab_settings_loglevel#:#Log-Level
