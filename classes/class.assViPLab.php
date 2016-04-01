@@ -882,6 +882,12 @@ class assViPLab extends assQuestion
 	
 	protected function createEvaluationJob($a_solution_json)
 	{
+		if(!$this->getVipAutoScoring())
+		{
+			return false;
+		}
+		
+		
 		$this->addSubParticipant();
 		
 		$job = new ilECSEvaluationJob();
