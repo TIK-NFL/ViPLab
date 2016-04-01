@@ -503,8 +503,6 @@ class assViPLab extends assQuestion
 		);
 		
 		$solution = ilUtil::stripSlashes($_POST['vipsolution']);
-		
-		ilLoggerFactory::getLogger('viplab')->debug('post was: ' . print_r($_POST,true));
 
 		$next_id = $ilDB->nextId('tst_solutions');
 		$ilDB->insert(
@@ -519,6 +517,9 @@ class assViPLab extends assQuestion
 				"tstamp" => array("integer", time())
 			)
 		);
+		
+		// create evaluation job 
+		$this->createEvaluationJob(ilViPLabUtil::decodeSolution($solution));
 		
 		
 		if($this->getVipResultStorage() or 1)
@@ -756,5 +757,213 @@ class assViPLab extends assQuestion
 			}
 		}
 	}
+	
+	/**
+	 * Create a new solution
+	 * @return int
+	 */
+	public function createEvaluation($a_decode = false)
+	{
+		if($a_decode and strlen($this->getVipEvaluation()))
+		{
+			$eva = ilViPLabUtil::decodeEvaluation($this->getVipEvaluation());
+		}
+		else
+		{
+			$eva = $this->getVipEvaluation();
+		}
+		try 
+		{
+			$scon = new ilECSEvaluationConnector(
+				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+			);
+			$new_id = $scon->addEvaluation($eva,
+					array(
+						ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
+						$this->getVipSubId()
+					)
+			);
+			ilLoggerFactory::getLogger('viplab')->debug('Received new evaluation id ' . $new_id);
+			return $new_id;
+		}
+		catch (ilECSConnectorException $exception)
+		{
+			ilLoggerFactory::getLogger('viplab')->error('Creating evaluation failed with message: '. $exception);
+		}
+	}
+	
+	/**
+	 * Create a new solution
+	 * @return int
+	 */
+	public function createResult($a_active_id, $a_pass)
+	{
+		$result_arr = $this->getSolutionValues($a_active_id, $a_pass);
+		if(isset($result_arr[1]))
+		{
+			$result_string = $result_arr[1]['value2'];
+		}
+		try 
+		{
+			$scon = new ilECSVipResultConnector(
+				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+			);
+			
+			$new_id = $scon->addResult($result_string,
+					array(
+						ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
+						$this->getVipSubId()
+					)
+			);
+			ilLoggerFactory::getLogger('viplab')->debug('Received new result id ' . $new_id);
+			return $new_id;
+		}
+		catch (ilECSConnectorException $exception)
+		{
+			ilLoggerFactory::getLogger('viplab')->error('Creating result failed with message: '. $exception);
+		}
+	}
+	
+	/**
+	 * Create exercise
+	 */
+	public function createExercise()
+	{
+		if(strlen($this->getVipExercise()))
+		{
+			$exc = $this->getVipExercise();
+		}
+		else
+		{
+			$exc = '';
+		}
+		try
+		{
+			$econ = new ilECSExerciseConnector(
+						ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+			);
+			
+			$new_id = $econ->addExercise($exc,
+					array(
+						ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
+						$this->getVipSubId()
+					)
+			);
+			$this->setVipExerciseId($new_id);
+			return $new_id;
+		}
+		catch (ilECSConnectorException $exception)
+		{
+			ilLoggerFactory::getLogger('viplab')->error('Creating exercise failed with message: '. $exception);
+		}
+	}
+	
+	public function createSolution($a_solution)
+	{
+		try 
+		{
+			$scon = new ilECSSolutionConnector(
+				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+			);
+			$new_id = $scon->addSolution($a_solution,
+					array(
+						ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),$this->getVipSubId()
+					)
+			);
+			ilLoggerFactory::getLogger('viplab')->debug('Received new solution id ' . $new_id);
+			return $new_id;
+		}
+		catch (ilECSConnectorException $exception)
+		{
+			ilLoggerFactory::getLogger('viplab')->error('Creating solution failed with message: '. $exception);
+		}
+		
+	}
+	
+	protected function createEvaluationJob($a_solution_json)
+	{
+		$this->addSubParticipant();
+		
+		$job = new ilECSEvaluationJob();
+		$job->setName('Evaluation job for active id ');
+		$dt = new ilDateTime(time(), IL_CAL_UNIX);
+		$job->setPostTime($dt);
+
+		$exc_id = $this->createExercise();
+		$job->setExercise($exc_id);
+		
+		$evaluation_id = $this->createEvaluation(true);
+		$job->setEvaluation($evaluation_id);
+		
+		$solution_id = $this->createSolution($a_solution_json);
+		$job->setSolution($solution_id);
+		$job->setMid(ilViPLabSettings::getInstance()->getEvaluationReceiverMid());
+		
+		ilLoggerFactory::getLogger('viplab')->debug($job->getJson());
+		
+		try
+		{
+			$scon = new ilECSEvaluationJobConnector(
+				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+			);
+			$new_id = $scon->addEvaluationJob(
+				$job,
+				ilViPLabSettings::getInstance()->getEvaluationMid()
+			);
+			ilLoggerFactory::getLogger('viplab')->debug('Received new solution id ' . $new_id);
+			return $new_id;
+			
+		} 
+		catch (ilECSConnectorException $exception)
+		{
+			ilLoggerFactory::getLogger('viplab')->error('Creating evaluation job failed with message: '. $exception);
+		}
+	}
+	
+	public function addSubParticipant()
+	{
+		if(TRUE)
+		#if(!$this->getViPLabQuestion()->getVipSubId())
+		{
+			$sub = new ilECSSubParticipant();
+			$com = ilViPLabUtil::lookupCommunityByMid(
+				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer()),
+				ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang())
+			);
+			if($com instanceof ilECSCommunity)
+			{
+				ilLoggerFactory::getLogger('viplab')->debug('Current community = ' . $com->getId());
+				$sub->addCommunity($com->getId());
+			}
+			else
+			{
+				ilUtil::sendFailure('Cannot assign subparticipant.');
+				return false;
+			}
+			
+			try 
+			{
+				$connector = new ilECSSubParticipantConnector(
+					ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+				);
+				$res = $connector->addSubParticipant($sub);
+			}
+			catch(ilECSConnectorException $e)
+			{
+				ilLoggerFactory::getLogger('viplab')->error('Failed with message: '. $e->getMessage());
+				exit;
+			}
+			
+			
+			// save cookie and sub_id
+			$this->setVipSubId($res->getMid());
+			$this->setVipCookie($res->getCookie());
+			ilLoggerFactory::getLogger('viplab')->debug('Recieved new cookie '. $res->getCookie());
+			ilLoggerFactory::getLogger('viplab')->debug('Recieved new  mid '. $res->getMid());
+		}		
+	}
+	
+	
+
 }
 ?>

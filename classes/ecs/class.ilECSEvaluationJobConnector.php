@@ -8,9 +8,11 @@ include_once './Services/WebServices/ECS/classes/class.ilECSConnectorException.p
  * Handler for ecs subparticipant ressources
  * 
  */
-class ilECSEvaluationConnector extends ilECSConnector
+class ilECSEvaluationJobConnector extends ilECSConnector
 {
-	const RESOURCE_PATH = '/numlab/evaluations';
+	const RESOURCE_PATH = '/numlab/evaluation_jobs';
+	
+	private $vip_settings = null;
 	
 	/**
 	 * Constructor
@@ -19,6 +21,17 @@ class ilECSEvaluationConnector extends ilECSConnector
 	public function __construct(ilECSSetting $settings = null)
 	{
 		parent::__construct($settings);
+		
+		$this->vip_settings = ilViPLabSettings::getInstance();
+		
+	}
+	
+	/**
+	 * @return ilViPLabSettings
+	 */
+	public function getVipSettings()
+	{
+		return $this->vip_settings;
 	}
 	
 	
@@ -27,9 +40,9 @@ class ilECSEvaluationConnector extends ilECSConnector
 	 * @param ilECSSubParticipant $sub
 	 * @param type $a_mid
 	 */
-	public function addEvaluation($exercise, $a_receiver_com)
+	public function addEvaluationJob(ilECSEvaluationJob $a_evaluation_job)
 	{
-		ilLoggerFactory::getLogger('viplab')->debug('Add new evaluation ressource for subparticipant: ' . $a_receiver_com);
+		ilLoggerFactory::getLogger('viplab')->debug('Add new evaluation job ressource');
 
 	 	$this->path_postfix = self::RESOURCE_PATH;
 	 	
@@ -39,43 +52,28 @@ class ilECSEvaluationConnector extends ilECSConnector
 
 			$this->addHeader('Content-Type', 'application/json');
 			$this->addHeader('Accept', 'application/json');
-			$this->addHeader(ilECSConnector::HEADER_MEMBERSHIPS, $a_receiver_com);
+			$this->addHeader(ilECSConnector::HEADER_MEMBERSHIPS, $this->getVipSettings()->getEvaluationMid());
 
 			$this->curl->setOpt(CURLOPT_HTTPHEADER, $this->getHeader());
 			$this->curl->setOpt(CURLOPT_HEADER,TRUE);
 	 		$this->curl->setOpt(CURLOPT_POST,TRUE);
 			
-			ilLoggerFactory::getLogger('viplab')->dump($exercise, ilLogLevel::DEBUG);
+			$this->curl->setOpt(CURLOPT_POSTFIELDS, $a_evaluation_job->getJson());
 			
-			if(strlen($exercise))
-			{
-				$this->curl->setOpt(CURLOPT_POSTFIELDS, $exercise);
-			}
-			else
-			{
-				$this->curl->setOpt(CURLOPT_POSTFIELDS, json_encode(NULL));
-			}
+			
 			$ret = $this->call();
 			$info = $this->curl->getInfo(CURLINFO_HTTP_CODE);
 	
 			ilLoggerFactory::getLogger('viplab')->debug('Checking HTTP status...');
 			if($info != self::HTTP_CODE_CREATED)
 			{
-				ilLoggerFactory::getLogger('viplab')->error('Cannot create evaluation ressource, did not receive HTTP 201');
+				ilLoggerFactory::getLogger('viplab')->error('Cannot create evaluation job ressource, did not receive HTTP 201');
 				ilLoggerFactory::getLogger('viplab')->error('Return value: '. print_r($ret, true));
 				throw new ilECSConnectorException('Received HTTP status code: '.$info);
 			}
 			ilLoggerFactory::getLogger('viplab')->debug('... got HTTP 201 (created)');
 
 			$eid =  self::_fetchEContentIdFromHeader($this->curl->getResponseHeaderArray());
-			
-			// store new ressource
-			$ressource = new ilECSViPLabRessource();
-			$ressource->setRessourceId($eid);
-			$ressource->setRessourceType(ilECSViPLabRessource::RES_EVALUATION);
-			$ressource->create();
-			
-			
 			return $eid;
 	 	}
 	 	catch(ilCurlConnectionException $exc)
@@ -85,36 +83,6 @@ class ilECSEvaluationConnector extends ilECSConnector
 		
 	}
 	
-	/**
-	 * Delete sub participant
-	 * @param type $a_exc_id
-	 */
-	public function deleteEvaluation($a_exc_id)
-	{
-		ilLoggerFactory::getLogger('viplab')->debug('Delete evaluation with id: '. $a_exc_id);
-	 	$this->path_postfix = self::RESOURCE_PATH;
-	 	
-	 	if($a_exc_id)
-	 	{
-	 		$this->path_postfix .= ('/'.(int) $a_exc_id);
-	 	}
-	 	else
-	 	{
-	 		throw new ilECSConnectorException('Error calling evaluation: No evaluation id given.');
-	 	}
-	
-	 	try 
-	 	{
-	 		$this->prepareConnection();
-	 		$this->curl->setOpt(CURLOPT_CUSTOMREQUEST,'DELETE');
-			$res = $this->call();
-			return new ilECSResult($res);
-	 	}
-	 	catch(ilCurlConnectionException $exc)
-	 	{
-	 		throw new ilECSConnectorException('Error calling ECS service: '.$exc->getMessage());
-	 	}
-	}
 	
 	/**
 	 * Add Header

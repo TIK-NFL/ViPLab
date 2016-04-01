@@ -26,3 +26,4 @@ form_tab_settings_eval_backend_info#:#Bitte wählen sie den Server aus, der auto
 form_tab_settings_loglevel#:#Log-Level
 auto_scoring#:#Automatische Korrektur
 auto_scoring_info#:#Wenn aktiviert, wird automatisch nach Abgabe einer Lösung eine Bewertung angefordert. Bitte fügen sie dem Aufgabentext einen Bewertungs-Code hinzu.
+form_tab_settings_mid#:#Server für Empfang automatischer Auswertungen

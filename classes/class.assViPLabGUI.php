@@ -425,25 +425,7 @@ class assViPLabGUI extends assQuestionGUI
 		{
 			return 0;
 		}
-		
-		try 
-		{
-			$scon = new ilECSSolutionConnector(
-				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
-			);
-			$new_id = $scon->addSolution($sol,
-					array(
-						ilViPLabSettings::getInstance()->getLanguageMid($this->getViPLabQuestion()->getVipLang()),
-						$this->getViPLabQuestion()->getVipSubId()
-					)
-			);
-			ilLoggerFactory::getLogger('viplab')->debug('Received new solution id ' . $new_id);
-			return $new_id;
-		}
-		catch (ilECSConnectorException $exception)
-		{
-			ilLoggerFactory::getLogger('viplab')->error('Creating solution failed with message: '. $exception);
-		}
+		return $this->getViPLabQuestion()->createSolution($sol);
 	}
 
 	/**
@@ -452,25 +434,7 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	protected function createEvaluation()
 	{
-		$eva = $this->getViPLabQuestion()->getVipEvaluation();
-		try 
-		{
-			$scon = new ilECSEvaluationConnector(
-				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
-			);
-			$new_id = $scon->addEvaluation($eva,
-					array(
-						ilViPLabSettings::getInstance()->getLanguageMid($this->getViPLabQuestion()->getVipLang()),
-						$this->getViPLabQuestion()->getVipSubId()
-					)
-			);
-			ilLoggerFactory::getLogger('viplab')->debug('Received new evaluation id ' . $new_id);
-			return $new_id;
-		}
-		catch (ilECSConnectorException $exception)
-		{
-			ilLoggerFactory::getLogger('viplab')->error('Creating evaluation failed with message: '. $exception);
-		}
+		return $this->getViPLabQuestion()->createEvaluation();
 	}
 	
 	/**
@@ -479,105 +443,21 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	protected function createResult($a_active_id, $a_pass)
 	{
-		$result_arr = $this->getViPLabQuestion()->getSolutionValues($a_active_id, $a_pass);
-		if(isset($result_arr[1]))
-		{
-			$result_string = $result_arr[1]['value2'];
-		}
-		try 
-		{
-			$scon = new ilECSVipResultConnector(
-				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
-			);
-			
-			$new_id = $scon->addResult($result_string,
-					array(
-						ilViPLabSettings::getInstance()->getLanguageMid($this->getViPLabQuestion()->getVipLang()),
-						$this->getViPLabQuestion()->getVipSubId()
-					)
-			);
-			ilLoggerFactory::getLogger('viplab')->debug('Received new result id ' . $new_id);
-			return $new_id;
-		}
-		catch (ilECSConnectorException $exception)
-		{
-			ilLoggerFactory::getLogger('viplab')->error('Creating result failed with message: '. $exception);
-		}
+		$this->getViPLabQuestion()->createResult($a_active_id, $a_pass);
 	}
 
+	/**
+	 * Create exercise
+	 */
 	protected function createExercise()
 	{
-		if(strlen($this->getViPLabQuestion()->getVipExercise()))
-		{
-			$exc = $this->getViPLabQuestion()->getVipExercise();
-		}
-		else
-		{
-			$exc = '';
-		}
-		try
-		{
-			$econ = new ilECSExerciseConnector(
-						ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
-			);
-			
-			$new_id = $econ->addExercise($exc,
-					array(
-						ilViPLabSettings::getInstance()->getLanguageMid($this->getViPLabQuestion()->getVipLang()),
-						$this->getViPLabQuestion()->getVipSubId()
-					)
-			);
-			$this->getViPLabQuestion()->setVipExerciseId($new_id);
-			#$this->getViPLabQuestion()->saveToDb();
-		}
-		catch (ilECSConnectorException $exception)
-		{
-			ilLoggerFactory::getLogger('viplab')->error('Creating exercise failed with message: '. $exception);
-		}
+		$this->getViPLabQuestion()->createExercise();
 	}
 	
 
 	protected function addSubParticipant()
 	{
-		if(TRUE)
-		#if(!$this->getViPLabQuestion()->getVipSubId())
-		{
-			$sub = new ilECSSubParticipant();
-			$com = ilViPLabUtil::lookupCommunityByMid(
-				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer()),
-				ilViPLabSettings::getInstance()->getLanguageMid($this->getViPLabQuestion()->getVipLang())
-			);
-			if($com instanceof ilECSCommunity)
-			{
-				ilLoggerFactory::getLogger('viplab')->debug('Current community = ' . $com->getId());
-				$sub->addCommunity($com->getId());
-			}
-			else
-			{
-				ilUtil::sendFailure('Cannot assign subparticipant.');
-				return $this->editQuestion();
-			}
-			
-			try 
-			{
-				$connector = new ilECSSubParticipantConnector(
-					ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
-				);
-				$res = $connector->addSubParticipant($sub);
-			}
-			catch(ilECSConnectorException $e)
-			{
-				ilLoggerFactory::getLogger('viplab')->error('Failed with message: '. $e->getMessage());
-				exit;
-			}
-			
-			
-			// save cookie and sub_id
-			$this->getViPLabQuestion()->setVipSubId($res->getMid());
-			$this->getViPLabQuestion()->setVipCookie($res->getCookie());
-			ilLoggerFactory::getLogger('viplab')->debug('Recieved new cookie '. $res->getCookie());
-			ilLoggerFactory::getLogger('viplab')->debug('Recieved new  mid '. $res->getMid());
-		}		
+		return $this->getViPLabQuestion()->addSubParticipant();
 	}
 
 	/**

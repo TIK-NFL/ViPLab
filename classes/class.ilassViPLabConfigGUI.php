@@ -127,6 +127,21 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		$evaluation_backend->setValue($settings->getEvaluationMid());
 		$form->addItem($evaluation_backend);
 		
+		// evaluation backend
+		$own_mid = new ilSelectInputGUI($this->getPluginObject()->txt('form_tab_settings_mid'),'evaluation_own_mid');
+		$evaluation_options = array();
+		if($settings->getECSServer())
+		{
+			$evaluation_options = $this->readAvailabeMids($settings,true);
+		}
+		else
+		{
+			$own_mid->setDisabled(true);
+		}
+		$own_mid->setOptions($evaluation_options);
+		$own_mid->setValue($settings->getEvaluationReceiverMid());
+		$form->addItem($own_mid);
+
 		// log level
 		$GLOBALS['lng']->loadLanguageModule('log');
 		$level = new ilSelectInputGUI($this->getPluginObject()->txt('form_tab_settings_loglevel'),'log_level');
@@ -190,7 +205,7 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 	 * @param ilViPLabSettings $settings
 	 * @return type
 	 */
-	protected function readAvailabeMids(ilViPLabSettings $settings)
+	protected function readAvailabeMids(ilViPLabSettings $settings, $a_only_self = false)
 	{
 		try
 		{
@@ -209,7 +224,11 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		
 		foreach((array) $participants as $mid => $part)
 		{
-			if($part->isSelf())
+			if($part->isSelf() && !$a_only_self)
+			{
+				continue;
+			}
+			if(!$part->isSelf() && $a_only_self)
 			{
 				continue;
 			}
@@ -235,6 +254,7 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 			$settings->setWidth($form->getInput('width'));
 			$settings->setHeight($form->getInput('height'));
 			$settings->setEvaluationMid($form->getInput('evaluation_mid'));
+			$settings->setEvaluationReceiverMid($form->getInput('evaluation_own_mid'));
 			
 			$this->getPluginObject()->includeClass('class.ilViPLabUtil.php');
 			
