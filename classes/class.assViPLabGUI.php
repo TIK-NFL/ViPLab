@@ -531,7 +531,12 @@ class assViPLabGUI extends assQuestionGUI
 		$this->getViPLabQuestion()->setQuestion($form->getInput('question'));
 		$this->getViPLabQuestion()->setPoints($form->getInput('points'));
 		$this->getViPLabQuestion()->setVipExercise($form->getInput('vipexercise'));
-		$this->getViPLabQuestion()->setVipEvaluation($form->getInput('vipevaluation'));
+		
+		$evaluation = ilViPLabUtil::extractJsonFromCustomZip($form->getInput('vipevaluation'));
+		$this->getViPLabQuestion()->setVipEvaluation($evaluation);
+		
+		
+		
 		$this->getViPLabQuestion()->setVipResultStorage($form->getInput('result_storing'));
 		$this->getViPLabQuestion()->setVipAutoScoring($form->getInput('auto_scoring'));
 		

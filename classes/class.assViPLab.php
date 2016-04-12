@@ -502,7 +502,7 @@ class assViPLab extends assQuestion
 			array($active_id, $this->getId(), $pass, "0")
 		);
 		
-		$solution = ilUtil::stripSlashes($_POST['vipsolution']);
+		$solution = ilViPLabUtil::extractJsonFromCustomZip(ilUtil::stripSlashes($_POST['vipsolution']));
 
 		$next_id = $ilDB->nextId('tst_solutions');
 		$ilDB->insert(
@@ -519,7 +519,7 @@ class assViPLab extends assQuestion
 		);
 		
 		// create evaluation job 
-		$this->createEvaluationJob(ilViPLabUtil::decodeSolution($solution));
+		$this->createEvaluationJob($solution);
 		
 		
 		if($this->getVipResultStorage() or 1)
@@ -762,11 +762,11 @@ class assViPLab extends assQuestion
 	 * Create a new solution
 	 * @return int
 	 */
-	public function createEvaluation($a_decode = false)
+	public function createEvaluation($a_decode = true)
 	{
 		if($a_decode and strlen($this->getVipEvaluation()))
 		{
-			$eva = ilViPLabUtil::decodeEvaluation($this->getVipEvaluation());
+			$eva = ilViPLabUtil::extractJsonFromCustomZip($this->getVipEvaluation());
 		}
 		else
 		{
