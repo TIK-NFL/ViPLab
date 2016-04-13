@@ -38,6 +38,28 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 		);
 	}
 	
+	/**
+	 * Handle ecs events
+	 * @param type $a_event_type
+	 * @param type $a_event
+	 */
+	public function handleEcsEvent($a_event_type, $a_event)
+	{
+		ilLoggerFactory::getLogger('viplab')->dump($a_event,  ilLogLevel::INFO);
+		
+		try {
+		
+			$connector = new ilECSVipResultConnector(ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer()));
+			$result = $connector->getResult($a_event['event']['id']);
+			
+			ilLoggerFactory::getLogger('viplab')->debug(print_r($result,true));
+		}
+		catch(Exception $ex) {
+			ilLoggerFactory::getLogger('viplab')->warning($ex->getMessage());
+		}
+		
+	}
+	
 	public function getPluginName()
 	{
 		return self::PNAME;

@@ -862,6 +862,9 @@ class assViPLab extends assQuestion
 	{
 		try 
 		{
+			
+			ilLoggerFactory::getLogger('viplab')->info($a_solution);
+			
 			$scon = new ilECSSolutionConnector(
 				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
 			);

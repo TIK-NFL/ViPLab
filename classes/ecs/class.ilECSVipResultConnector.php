@@ -21,6 +21,42 @@ class ilECSVipResultConnector extends ilECSConnector
 		parent::__construct($settings);
 	}
 	
+	/**
+	 * Read result
+	 * @param type $a_id
+	 * @return \ilECSResult
+	 * @throws ilECSConnectorException
+	 */
+	public function getResult($a_id)
+	{
+		$this->path_postfix = self::RESOURCE_PATH.'/'.$a_id;
+
+		try {
+			$this->prepareConnection();
+			$this->addHeader('Content-Type', 'application/json');
+			$this->addHeader('Accept', 'application/json');
+
+			$res = $this->call();
+
+			// Checking status code
+			$info = $this->curl->getInfo(CURLINFO_HTTP_CODE);
+			if($info != self::HTTP_CODE_OK)
+			{
+				ilLoggerFactory::getLogger('viplab')->warning('Cannot read viplab result, did not receive HTTP 200');
+				throw new ilECSConnectorException('Received HTTP status code: '.$info);
+			}
+			$result = new ilECSResult($res);
+
+			ilLoggerFactory::getLogger('viplab')->dump($result->getResult(),  ilLogLevel::INFO);
+			return $result;
+	 	}
+	 	catch(ilCurlConnectionException $exc)
+	 	{
+	 		throw new ilECSConnectorException('Error calling ECS service: '.$exc->getMessage());
+	 	}
+
+	}
+	
 	
 	/**
 	 * Add subparticipant
