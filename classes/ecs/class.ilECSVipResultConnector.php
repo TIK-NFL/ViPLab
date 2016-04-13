@@ -46,8 +46,6 @@ class ilECSVipResultConnector extends ilECSConnector
 				throw new ilECSConnectorException('Received HTTP status code: '.$info);
 			}
 			$result = new ilECSResult($res);
-
-			ilLoggerFactory::getLogger('viplab')->dump($result->getResult(),  ilLogLevel::INFO);
 			return $result;
 	 	}
 	 	catch(ilCurlConnectionException $exc)

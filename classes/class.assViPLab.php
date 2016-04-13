@@ -519,7 +519,11 @@ class assViPLab extends assQuestion
 		);
 		
 		// create evaluation job 
-		$this->createEvaluationJob($solution);
+		$this->createEvaluationJob(
+			$solution,
+			$active_id,
+			$pass
+		);
 		
 		
 		if($this->getVipResultStorage() or 1)
@@ -762,7 +766,7 @@ class assViPLab extends assQuestion
 	 * Create a new solution
 	 * @return int
 	 */
-	public function createEvaluation($a_decode = true)
+	public function createEvaluation($a_decode = true, $a_computational_backend = true)
 	{
 		if($a_decode and strlen($this->getVipEvaluation()))
 		{
@@ -777,12 +781,20 @@ class assViPLab extends assQuestion
 			$scon = new ilECSEvaluationConnector(
 				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
 			);
-			$new_id = $scon->addEvaluation($eva,
-					array(
-						ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
-						$this->getVipSubId()
-					)
-			);
+			
+			if($a_computational_backend)
+			{
+				$targets = array(
+					ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
+					$this->getVipSubId()
+				);
+			}
+			else
+			{
+				$targets = ilViPLabSettings::getInstance()->getEvaluationMid();
+			}
+			
+			$new_id = $scon->addEvaluation($eva,$targets);
 			ilLoggerFactory::getLogger('viplab')->debug('Received new evaluation id ' . $new_id);
 			return $new_id;
 		}
@@ -827,7 +839,7 @@ class assViPLab extends assQuestion
 	/**
 	 * Create exercise
 	 */
-	public function createExercise()
+	public function createExercise($a_computational_backend = true)
 	{
 		if(strlen($this->getVipExercise()))
 		{
@@ -843,12 +855,21 @@ class assViPLab extends assQuestion
 						ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
 			);
 			
-			$new_id = $econ->addExercise($exc,
-					array(
-						ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
-						$this->getVipSubId()
-					)
-			);
+			if($a_computational_backend)
+			{
+				$targets = array(
+					ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
+					$this->getVipSubId()
+				);
+			}
+			else
+			{
+				$targets = array(
+					ilViPLabSettings::getInstance()->getEvaluationMid()
+				);
+			}
+			ilLoggerFactory::getLogger('viplab')->debug($exc);
+			$new_id = $econ->addExercise($exc,$targets);
 			$this->setVipExerciseId($new_id);
 			return $new_id;
 		}
@@ -858,21 +879,29 @@ class assViPLab extends assQuestion
 		}
 	}
 	
-	public function createSolution($a_solution)
+	public function createSolution($a_solution, $a_computational_backend = true)
 	{
 		try 
 		{
-			
 			ilLoggerFactory::getLogger('viplab')->info($a_solution);
 			
 			$scon = new ilECSSolutionConnector(
 				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
 			);
-			$new_id = $scon->addSolution($a_solution,
-					array(
-						ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),$this->getVipSubId()
-					)
-			);
+			
+			if($a_computational_backend)
+			{
+				$targets = array(
+					ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
+					$this->getVipSubId()
+				);
+			}
+			else
+			{
+				$targets = ilViPLabSettings::getInstance()->getEvaluationMid();
+			}
+			
+			$new_id = $scon->addSolution($a_solution,$targets);
 			ilLoggerFactory::getLogger('viplab')->debug('Received new solution id ' . $new_id);
 			return $new_id;
 		}
@@ -883,32 +912,38 @@ class assViPLab extends assQuestion
 		
 	}
 	
-	protected function createEvaluationJob($a_solution_json)
+	protected function createEvaluationJob($a_solution_json, $a_active_id, $a_pass)
 	{
 		if(!$this->getVipAutoScoring())
 		{
 			return false;
 		}
 		
+		ilLoggerFactory::getLogger('viplab')->debug('---------------- New evaluation job ------------------');
 		
-		$this->addSubParticipant();
+		
+		//$this->addSubParticipant();
 		
 		$job = new ilECSEvaluationJob();
-		$job->setName('Evaluation job for active id ');
+		$job->setName('Evaluation job for active_id: ' . $a_active_id);
 		$dt = new ilDateTime(time(), IL_CAL_UNIX);
 		$job->setPostTime($dt);
+		
+		$job->setIdentifier(
+			$this->getId().'_'.(int) $a_active_id.'_'.(int) $a_pass
+		);
 
-		$exc_id = $this->createExercise();
+		$exc_id = $this->createExercise(false);
 		$job->setExercise($exc_id);
 		
-		$evaluation_id = $this->createEvaluation(true);
+		$evaluation_id = $this->createEvaluation(true,false);
 		$job->setEvaluation($evaluation_id);
 		
-		$solution_id = $this->createSolution($a_solution_json);
+		$solution_id = $this->createSolution($a_solution_json,false);
 		$job->setSolution($solution_id);
-		$job->setMid(ilViPLabSettings::getInstance()->getEvaluationReceiverMid());
+		$job->setMid(ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()));
 		
-		ilLoggerFactory::getLogger('viplab')->debug($job->getJson());
+		ilLoggerFactory::getLogger('viplab')->debug('--------------------- '. $job->getJson().' ---------------------------');
 		
 		try
 		{
@@ -919,7 +954,7 @@ class assViPLab extends assQuestion
 				$job,
 				ilViPLabSettings::getInstance()->getEvaluationMid()
 			);
-			ilLoggerFactory::getLogger('viplab')->debug('Received new solution id ' . $new_id);
+			ilLoggerFactory::getLogger('viplab')->debug('Received new evaluation job id ' . $new_id);
 			return $new_id;
 			
 		} 

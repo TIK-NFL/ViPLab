@@ -29,7 +29,7 @@ class ilECSExerciseConnector extends ilECSConnector
 	 */
 	public function addExercise($exercise, $a_receiver_com)
 	{
-		ilLoggerFactory::getLogger('viplab')->debug('Add new exercise ressource for subparticipant: '. $a_receiver_com);
+		ilLoggerFactory::getLogger('viplab')->debug('Add new exercise ressource for subparticipant: '. print_r($a_receiver_com,true));
 
 	 	$this->path_postfix = self::RESOURCE_PATH;
 	 	

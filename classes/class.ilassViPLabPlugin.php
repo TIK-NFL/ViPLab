@@ -51,8 +51,11 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 		
 			$connector = new ilECSVipResultConnector(ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer()));
 			$result = $connector->getResult($a_event['event']['id']);
-			
-			ilLoggerFactory::getLogger('viplab')->debug(print_r($result,true));
+
+			if($result instanceof ilECSResult)
+			{
+				ilLoggerFactory::getLogger('viplab')->debug($result->getPlainResultString());
+			}
 		}
 		catch(Exception $ex) {
 			ilLoggerFactory::getLogger('viplab')->warning($ex->getMessage());

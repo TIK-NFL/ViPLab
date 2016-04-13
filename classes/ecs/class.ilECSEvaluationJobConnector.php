@@ -40,9 +40,9 @@ class ilECSEvaluationJobConnector extends ilECSConnector
 	 * @param ilECSSubParticipant $sub
 	 * @param type $a_mid
 	 */
-	public function addEvaluationJob(ilECSEvaluationJob $a_evaluation_job)
+	public function addEvaluationJob(ilECSEvaluationJob $a_evaluation_job, $a_targets)
 	{
-		ilLoggerFactory::getLogger('viplab')->debug('Add new evaluation job ressource');
+		ilLoggerFactory::getLogger('viplab')->debug('Add new evaluation job ressource for ' . print_r($a_targets,true));
 
 	 	$this->path_postfix = self::RESOURCE_PATH;
 	 	
@@ -52,7 +52,7 @@ class ilECSEvaluationJobConnector extends ilECSConnector
 
 			$this->addHeader('Content-Type', 'application/json');
 			$this->addHeader('Accept', 'application/json');
-			$this->addHeader(ilECSConnector::HEADER_MEMBERSHIPS, $this->getVipSettings()->getEvaluationMid());
+			$this->addHeader(ilECSConnector::HEADER_MEMBERSHIPS, $a_targets);
 
 			$this->curl->setOpt(CURLOPT_HTTPHEADER, $this->getHeader());
 			$this->curl->setOpt(CURLOPT_HEADER,TRUE);
