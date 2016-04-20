@@ -6,7 +6,7 @@
  */
 class ilViPLabUtil
 {
-	protected static $languages = array('C','C++','DuMux','Java','Matlab','Octave');
+	protected static $languages = array('C','C_P','C++','C++_P','DuMux','DuMux_P','Java','Java_P','Matlab','Matlab_P','Octave','Octave_P');
 	
 	
 	/**
