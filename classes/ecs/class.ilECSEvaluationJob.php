@@ -86,7 +86,7 @@ class ilECSEvaluationJob
 	
 	public function getJson()
 	{
-		return json_encode($this->EvaluationJob);
+		return json_encode($this);
 	}
 
 }
