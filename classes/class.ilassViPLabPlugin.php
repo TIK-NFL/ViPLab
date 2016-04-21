@@ -47,25 +47,85 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 	{
 		ilLoggerFactory::getLogger('viplab')->debug('Handling new event: ' . $a_event['event']['type']);
 		
-		if($a_event['event']['type'] != 'points')
+		if($a_event['event']['type'] == 'results')
 		{
-			return true;
+			ilLoggerFactory::getLogger('viplab')->info('Ignoring event of type results');
+			return false;
+			/*
+			try {
+				$connector = new ilECSVipResultConnector(ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer()));
+				$result = $connector->getResult($a_event['event']['id']);
+
+				if($result instanceof ilECSResult)
+				{
+					ilLoggerFactory::getLogger('viplab')->debug($result->getPlainResultString());
+				}
+				return true;
+			}
+			catch(Exception $e) {
+				ilLoggerFactory::getLogger('viplab')->warning($e->getMessage());
+			}
+			 */
+			
 		}
 		
 		try {
 		
 			$connector = new ilECSPointsConnector(ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer()));
 			$result = $connector->getPoints($a_event['event']['id']);
-
 			if($result instanceof ilECSResult)
 			{
 				ilLoggerFactory::getLogger('viplab')->debug($result->getPlainResultString());
+				$this->updateQuestionPoints($result);
+				return true;
 			}
 		}
 		catch(Exception $ex) {
 			ilLoggerFactory::getLogger('viplab')->warning($ex->getMessage());
 		}
 		
+	}
+	
+	/**
+	 * Update scoring from ecs
+	 * @param object $json
+	 */
+	protected function updateQuestionPoints(ilECSResult $result)
+	{
+		$points = $result->getResult();
+		
+		if(!is_object($points->Points))
+		{
+			ilLoggerFactory::getLogger('viplab')->warning('Expected json Points received: ');
+			ilLoggerFactory::getLogger('viplab')->dump($points, ilLogLevel::WARNING);
+			return false;
+		}
+		
+		$identifier = (string) $points->Points->identifier;
+		$received_points = (int) $points->Points->points;
+
+		list($qid, $active_id, $pass) = explode('_', $identifier);
+		
+		if(isset($qid) && isset($active_id) && isset($pass))
+		{
+			include_once './Modules/TestQuestionPool/classes/class.assQuestion.php';
+			assQuestion::_setReachedPoints(
+				$active_id,
+				$qid,
+				$received_points,
+				assQuestion::_getMaximumPoints($qid),
+				$pass,
+				false,
+				true
+			);
+			
+			// todo lp status wrapper
+		}
+		else
+		{
+			ilLoggerFactory::getLogger('viplab')->warning('Cannot save scoring result');
+			ilLoggerFactory::getLogger('viplab')->dump($points, ilLogLevel::WARNING);
+		}
 	}
 	
 	public function getPluginName()
