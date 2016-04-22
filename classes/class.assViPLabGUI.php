@@ -339,7 +339,7 @@ class assViPLabGUI extends assQuestionGUI
 			$applet->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
 			$applet->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 			$applet->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
-			$applet->setVariable('VIP_LANG',$this->getViPLabQuestion()->getVipLang());
+			$applet->setVariable('VIP_LANG',$this->getViPLabQuestion()->getVipLang(true));
 			$applet->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
 			$applet->setVariable('VIP_EVALUATION',$eva_id);
 			$applet->setVariable('INITJS',$this->getPlugin()->getDirectory().'/templates');
@@ -740,7 +740,7 @@ class assViPLabGUI extends assQuestionGUI
 				$soltpl->setVariable('VIP_RESULT', '');
 			}
 			
-			$soltpl->setVariable('VIP_LANG',$this->getViPLabQuestion()->getVipLang());
+			$soltpl->setVariable('VIP_LANG',$this->getViPLabQuestion()->getVipLang(true));
 
 			$soltpl->setVariable('VIP_STORED_EXERCISE', $this->getViPLabQuestion()->getVipExerciseId());
 			$soltpl->setVariable('VIP_STORED_PARTICIPANT',$this->getViPLabQuestion()->getVipSubId());

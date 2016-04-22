@@ -125,8 +125,18 @@ class assViPLab extends assQuestion
 		$this->vip_lang = $a_lang;
 	}
 	
-	public function getVipLang()
+	/**
+	 * Get vip lang
+	 * @param type $a_shortened
+	 * @return type
+	 */
+	public function getVipLang($a_shortened = false)
 	{
+		if($a_shortened && stristr($this->vip_lang, '_P'))
+		{
+			return substr($this->vip_lang, 0, -2);
+		}
+		
 		return $this->vip_lang;
 	}
 	
@@ -784,10 +794,14 @@ class assViPLab extends assQuestion
 			
 			if($a_computational_backend)
 			{
+				// mantis: #15974
+				$targets = $this->getVipSubId();
+				/**
 				$targets = array(
 					ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
 					$this->getVipSubId()
 				);
+				 */
 			}
 			else
 			{
@@ -891,10 +905,14 @@ class assViPLab extends assQuestion
 			
 			if($a_computational_backend)
 			{
+				$targets = $this->getVipSubId();
+				/**
 				$targets = array(
 					ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
 					$this->getVipSubId()
 				);
+				 * 
+				 */
 			}
 			else
 			{

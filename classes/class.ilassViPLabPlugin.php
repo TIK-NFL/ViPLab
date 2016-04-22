@@ -118,7 +118,6 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 				false,
 				true
 			);
-			
 			// todo lp status wrapper
 		}
 		else
