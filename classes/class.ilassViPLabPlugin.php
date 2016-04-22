@@ -38,6 +38,11 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 		);
 	}
 	
+	public function handleCronJob()
+	{
+		return ilECSViPLabRessources::deleteDeprecated();
+	}
+	
 	/**
 	 * Handle ecs events
 	 * @param type $a_event_type

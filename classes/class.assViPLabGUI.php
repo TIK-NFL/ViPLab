@@ -405,14 +405,14 @@ class assViPLabGUI extends assQuestionGUI
 	protected function createSolution($a_active_id, $a_pass = null, $a_force_empty_solution = true)
 	{
 		// always create solution
-		$a_force_empty_solution = true;
+		//$a_force_empty_solution = true;
 		
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
 		if(!ilObjTest::_getUsePreviousAnswers($a_active_id, true))
 		{
 			if(is_null($a_pass))
 			{
-				$pass = ilObjTest::_getPass($a_active_id);
+				$a_pass = ilObjTest::_getPass($a_active_id);
 			}
 		}
 		$sol_arr = $this->getViPLabQuestion()->getUserSolutionPreferingIntermediate($a_active_id, $a_pass);
