@@ -1,17 +1,18 @@
 <p>{QUESTIONTEXT}</p>
 <!-- BEGIN complete -->
-<div id="student_applet_placeholder" style="width: 90%; height: 60vh">
-<div id="student_applet_toggle" style="position: absolute; width: 90%; height: 60vh">
+<div id="student_applet_placeholder" style="width: 90%; height: 80vh">
+<div id="student_applet_toggle" style="position: absolute; width: 90%; height: 80vh">
 <!--                                           -->
 <!-- This script loads your compiled module.   -->
 <!-- If you add any GWT meta tags, they must   -->
 <!-- be added before this line.                -->
 <!--                                           -->
     <meta name="gwt:property" content="locale=<%=request.getLocale()%>">
-    <meta name="viplab:exercise" content="{VIP_EXERCISE}"> <!-- has 2D plots -->
+    <meta name="viplab:exercise" content="{VIP_EXERCISE}"> 
     <meta name="viplab:ecslocation" content="{VIP_ECS_URL}/numlab">
     <meta name="viplab:cookie" content="{VIP_COOKIE}">
     <meta name="viplab:compmid" content="{VIP_MID}">
+    <meta name="viplab:solution" content="{VIP_SOLUTION}">
     <meta name="viplab:container" content="student_applet_toggle">
     <script type="text/javascript" language="javascript" src="{INITJS}/viplab/viplab.nocache.js"></script>
     <script src="{INITJS}/ace/ace.js" type="text/javascript" charset="utf-8"></script>
@@ -36,7 +37,7 @@
         in order for this application to display correctly.
       </div>
     </noscript>
-    <input type="hidden" id="vipsolution" name="vipsolution" value="{VIP_STORED_VALUE}" />
+    <input type="hidden" id="vipsolution" name="vipsolution" value="{VIP_STORED_SOLUTION}" />
     <input type="hidden" name="vipexercise" value="{VIP_STORED_EXERCISE}" />
     <input type="hidden" name="vipparticipant" value="{VIP_STORED_PARTICIPANT}" />
     <input type="hidden" id="vipresult" name="vipresult" value="{VIP_STORED_RESULT}" />

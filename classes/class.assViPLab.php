@@ -42,6 +42,7 @@ class assViPLab extends assQuestion
 	private $vip_exercise = '';
 	private $vip_evaluation = '';
 	private $vip_exercise_id = 0;
+	private $vip_auto_scoring = false;
 
 	
 	private $plugin;
@@ -68,11 +69,11 @@ class assViPLab extends assQuestion
 	)
 	{
 		parent::__construct($title, $comment, $author, $owner, $question);
-		$this->plugin = ilViPLabPlugin::getInstance();
+		$this->plugin = ilassViPLabPlugin::getInstance();
 	}
 	
 	/**
-	 * @return ilViPLabPlugin The plugin object
+	 * @return ilassViPLabPlugin The plugin object
 	 */
 	public function getPlugin() 
 	{
@@ -124,8 +125,18 @@ class assViPLab extends assQuestion
 		$this->vip_lang = $a_lang;
 	}
 	
-	public function getVipLang()
+	/**
+	 * Get vip lang
+	 * @param type $a_shortened
+	 * @return type
+	 */
+	public function getVipLang($a_shortened = false)
 	{
+		if($a_shortened && stristr($this->vip_lang, '_P'))
+		{
+			return substr($this->vip_lang, 0, -2);
+		}
+		
 		return $this->vip_lang;
 	}
 	
@@ -167,6 +178,16 @@ class assViPLab extends assQuestion
 	{
 		$this->vip_result_storage = $a_res;
 	}
+	
+	public function setVipAutoScoring($a_auto_scoring)
+	{
+		$this->vip_auto_scoring = $a_auto_scoring;
+	}		
+	
+	public function getVipAutoScoring()
+	{
+		return $this->vip_auto_scoring;
+	}
 
 	/**
 	 * Returns true, if a single choice question is complete for use
@@ -193,7 +214,7 @@ class assViPLab extends assQuestion
 	*/
 	function saveToDb($original_id = "")
 	{
-		global $ilDB, $ilLog;
+		global $ilDB;
 
 		$this->saveQuestionDataToDb($original_id);
 
@@ -215,7 +236,8 @@ class assViPLab extends assQuestion
 					'vip_lang'		=> array('text', (string) $this->getVipLang()),
 					'vip_exercise_id'	=> array('integer',(string) $this->getVipExerciseId()),
 					'vip_evaluation' => array('clob',(string) $this->getVipEvaluation()),
-					'vip_result_storage' => array('integer',(string) $this->getVipResultStorage())
+					'vip_result_storage' => array('integer',(string) $this->getVipResultStorage()),
+					'vip_auto_scoring' => array('integer', (int) $this->getVipAutoScoring())
 				)
 		);
 		parent::saveToDb($original_id);
@@ -277,8 +299,7 @@ class assViPLab extends assQuestion
 				$this->setVipExerciseId((int) $data['vip_exercise_id']);
 				$this->setVipEvaluation((string) $data['vip_evaluation']);
 				$this->setVipResultStorage((int) $data['vip_result_storage']);
-				
-				#$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($data,TRUE));
+				$this->setVipAutoScoring((int) $data['vip_auto_scoring']);
 			}
 		}
 		parent::loadFromDb($question_id);
@@ -291,7 +312,7 @@ class assViPLab extends assQuestion
 	 *
 	 * @access public
 	 */
-	public function duplicate($for_test = true, $title = "", $author = "", $owner = "")
+	public function duplicate($for_test = true, $title = "", $author = "", $owner = "", $a_test_obj_id = null)
 	{
 		if ($this->id <= 0)
 		{
@@ -333,10 +354,47 @@ class assViPLab extends assQuestion
         // copy XHTML media objects
         $clone->copyXHTMLMediaObjectsOfQuestion($this_id);
 
-        $clone->onDuplicate($this->getObjId(), $this_id, $clone->getObjId(), $clone->getId());
+        $clone->onDuplicate($a_test_obj_id, $this_id, $clone->getObjId(), $clone->getId());
 
 		return $clone->id;
 	}
+	
+	
+	public function createNewOriginalFromThisDuplicate($targetParentId, $targetQuestionTitle = "")
+	{
+		if ($this->id <= 0)
+		{
+			// The question has not been saved. It cannot be duplicated
+			return;
+		}
+
+		include_once ("./Modules/TestQuestionPool/classes/class.assQuestion.php");
+
+		$sourceQuestionId = $this->id;
+		$sourceParentId = $this->getObjId();
+
+		// duplicate the question in database
+		$clone = $this;
+		$clone->id = -1;
+
+		$clone->setObjId($targetParentId);
+
+		if ($targetQuestionTitle)
+		{
+			$clone->setTitle($targetQuestionTitle);
+		}
+
+		$clone->saveToDb();
+		// copy question page content
+		$clone->copyPageOfQuestion($sourceQuestionId);
+		// copy XHTML media objects
+		$clone->copyXHTMLMediaObjectsOfQuestion($sourceQuestionId);
+
+		$clone->onCopy($sourceParentId, $sourceQuestionId, $clone->getObjId(), $clone->getId());
+
+		return $clone->id;
+	}
+	
 
 	/**
 	* Copies an assMathematikOnline object
@@ -396,7 +454,7 @@ class assViPLab extends assQuestion
 	 * @param boolean $returndetails (deprecated !!)
 	 * @access public
 	 */
-	function calculateReachedPoints($active_id, $pass = NULL, $returndetails = FALSE)
+	function calculateReachedPoints($active_id, $pass = NULL, $authorizedSolution = true, $returndetails = FALSE)
 	{
 		global $ilDB;
 		
@@ -428,12 +486,11 @@ class assViPLab extends assQuestion
 	 * @access public
 	 * @see $answers
 	 */
-	public function saveWorkingData($active_id, $pass = NULL)
+	public function saveWorkingData($active_id, $pass = NULL, $authorized = true)
 	{
 		global $ilDB;
 		
-		
-		$GLOBALS['ilLog']->write(__METHOD__.': +++++++++++++ save working data');
+		ilLoggerFactory::getLogger('viplab')->debug('++++ save working data');
 
 		if(is_null($pass))
 		{
@@ -455,9 +512,7 @@ class assViPLab extends assQuestion
 			array($active_id, $this->getId(), $pass, "0")
 		);
 		
-		$solution = ilUtil::stripSlashes($_POST['vipsolution']);
-		
-		$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($_POST,TRUE));
+		$solution = ilViPLabUtil::extractJsonFromCustomZip(ilUtil::stripSlashes($_POST['vipsolution']));
 
 		$next_id = $ilDB->nextId('tst_solutions');
 		$ilDB->insert(
@@ -471,6 +526,13 @@ class assViPLab extends assQuestion
 				"pass" => array("integer", $pass),
 				"tstamp" => array("integer", time())
 			)
+		);
+		
+		// create evaluation job 
+		$this->createEvaluationJob(
+			$solution,
+			$active_id,
+			$pass
 		);
 		
 		
@@ -659,7 +721,7 @@ class assViPLab extends assQuestion
 		
 		if($exc_id)
 		{
-			$GLOBALS['ilLog']->write('Deleting exercise');
+			ilLoggerFactory::getLogger('viplab')->debug('Deleting exercise');
 			try
 			{
 				$connector = new ilECSExerciseConnector(
@@ -675,7 +737,7 @@ class assViPLab extends assQuestion
 			}
 			catch(ilECSConnectorException $e)
 			{
-				$GLOBALS['ilLog']->write(__METHOD__.': Failed with message: '. $e->getMessage());
+				ilLoggerFactory::getLogger('viplab')->error('Deleting exercise failed with message: '. $e->getMessage());
 			}
 		}
 	}
@@ -689,7 +751,7 @@ class assViPLab extends assQuestion
 		
 		if($sub_id)
 		{
-			$GLOBALS['ilLog']->write('Deleting subparticipant');
+			ilLoggerFactory::getLogger('viplab')->debug('Deleting subparticipant');
 			try
 			{
 				$connector = new ilECSSubParticipantConnector(
@@ -705,10 +767,265 @@ class assViPLab extends assQuestion
 			}
 			catch(ilECSConnectorException $e)
 			{
-				$GLOBALS['ilLog']->write(__METHOD__.': Failed with message: '. $e->getMessage());
+				ilLoggerFactory::getLogger('viplab')->error('Deleting subparticipant failed with message: ' . $e->getMessage());
 			}
 		}
 	}
-}
+	
+	/**
+	 * Create a new solution
+	 * @return int
+	 */
+	public function createEvaluation($a_decode = true, $a_computational_backend = true)
+	{
+		if($a_decode and strlen($this->getVipEvaluation()))
+		{
+			$eva = ilViPLabUtil::extractJsonFromCustomZip($this->getVipEvaluation());
+		}
+		else
+		{
+			$eva = $this->getVipEvaluation();
+		}
+		try 
+		{
+			$scon = new ilECSEvaluationConnector(
+				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+			);
+			
+			if($a_computational_backend)
+			{
+				// mantis: #15974
+				$targets = $this->getVipSubId();
+				/**
+				$targets = array(
+					ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
+					$this->getVipSubId()
+				);
+				 */
+			}
+			else
+			{
+				$targets = ilViPLabSettings::getInstance()->getEvaluationMid();
+			}
+			
+			$new_id = $scon->addEvaluation($eva,$targets);
+			ilLoggerFactory::getLogger('viplab')->debug('Received new evaluation id ' . $new_id);
+			return $new_id;
+		}
+		catch (ilECSConnectorException $exception)
+		{
+			ilLoggerFactory::getLogger('viplab')->error('Creating evaluation failed with message: '. $exception);
+		}
+	}
+	
+	/**
+	 * Create a new solution
+	 * @return int
+	 */
+	public function createResult($a_active_id, $a_pass)
+	{
+		$result_arr = $this->getSolutionValues($a_active_id, $a_pass);
+		if(isset($result_arr[1]))
+		{
+			$result_string = $result_arr[1]['value2'];
+		}
+		try 
+		{
+			$scon = new ilECSVipResultConnector(
+				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+			);
+			
+			$new_id = $scon->addResult($result_string,
+					array(
+						ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
+						$this->getVipSubId()
+					)
+			);
+			ilLoggerFactory::getLogger('viplab')->debug('Received new result id ' . $new_id);
+			return $new_id;
+		}
+		catch (ilECSConnectorException $exception)
+		{
+			ilLoggerFactory::getLogger('viplab')->error('Creating result failed with message: '. $exception);
+		}
+	}
+	
+	/**
+	 * Create exercise
+	 */
+	public function createExercise($a_computational_backend = true)
+	{
+		if(strlen($this->getVipExercise()))
+		{
+			$exc = $this->getVipExercise();
+		}
+		else
+		{
+			$exc = '';
+		}
+		try
+		{
+			$econ = new ilECSExerciseConnector(
+						ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+			);
+			
+			if($a_computational_backend)
+			{
+				$targets = array(
+					ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
+					$this->getVipSubId()
+				);
+			}
+			else
+			{
+				$targets = array(
+					ilViPLabSettings::getInstance()->getEvaluationMid()
+				);
+			}
+			ilLoggerFactory::getLogger('viplab')->debug($exc);
+			$new_id = $econ->addExercise($exc,$targets);
+			$this->setVipExerciseId($new_id);
+			return $new_id;
+		}
+		catch (ilECSConnectorException $exception)
+		{
+			ilLoggerFactory::getLogger('viplab')->error('Creating exercise failed with message: '. $exception);
+		}
+	}
+	
+	public function createSolution($a_solution, $a_computational_backend = true)
+	{
+		try 
+		{
+			ilLoggerFactory::getLogger('viplab')->info($a_solution);
+			
+			$scon = new ilECSSolutionConnector(
+				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+			);
+			
+			if($a_computational_backend)
+			{
+				$targets = $this->getVipSubId();
+				/**
+				$targets = array(
+					ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
+					$this->getVipSubId()
+				);
+				 * 
+				 */
+			}
+			else
+			{
+				$targets = ilViPLabSettings::getInstance()->getEvaluationMid();
+			}
+			
+			$new_id = $scon->addSolution($a_solution,$targets);
+			ilLoggerFactory::getLogger('viplab')->debug('Received new solution id ' . $new_id);
+			return $new_id;
+		}
+		catch (ilECSConnectorException $exception)
+		{
+			ilLoggerFactory::getLogger('viplab')->error('Creating solution failed with message: '. $exception);
+		}
+		
+	}
+	
+	protected function createEvaluationJob($a_solution_json, $a_active_id, $a_pass)
+	{
+		if(!$this->getVipAutoScoring())
+		{
+			return false;
+		}
+		
+		ilLoggerFactory::getLogger('viplab')->debug('---------------- New evaluation job ------------------');
+		
+		
+		//$this->addSubParticipant();
+		
+		$job = new ilECSEvaluationJob();
+		$job->setName('Evaluation job for active_id: ' . $a_active_id);
+		$dt = new ilDateTime(time(), IL_CAL_UNIX);
+		$job->setPostTime($dt);
+		
+		$job->setIdentifier(
+			$this->getId().'_'.(int) $a_active_id.'_'.(int) $a_pass
+		);
 
+		$exc_id = $this->createExercise(false);
+		$job->setExercise($exc_id);
+		
+		$evaluation_id = $this->createEvaluation(true,false);
+		$job->setEvaluation($evaluation_id);
+		
+		$solution_id = $this->createSolution($a_solution_json,false);
+		$job->setSolution($solution_id);
+		$job->setMid(ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()));
+		
+		ilLoggerFactory::getLogger('viplab')->debug('--------------------- '. $job->getJson().' ---------------------------');
+		
+		try
+		{
+			$scon = new ilECSEvaluationJobConnector(
+				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+			);
+			$new_id = $scon->addEvaluationJob(
+				$job,
+				ilViPLabSettings::getInstance()->getEvaluationMid()
+			);
+			ilLoggerFactory::getLogger('viplab')->debug('Received new evaluation job id ' . $new_id);
+			return $new_id;
+			
+		} 
+		catch (ilECSConnectorException $exception)
+		{
+			ilLoggerFactory::getLogger('viplab')->error('Creating evaluation job failed with message: '. $exception);
+		}
+	}
+	
+	public function addSubParticipant()
+	{
+		if(TRUE)
+		#if(!$this->getViPLabQuestion()->getVipSubId())
+		{
+			$sub = new ilECSSubParticipant();
+			$com = ilViPLabUtil::lookupCommunityByMid(
+				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer()),
+				ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang())
+			);
+			if($com instanceof ilECSCommunity)
+			{
+				ilLoggerFactory::getLogger('viplab')->debug('Current community = ' . $com->getId());
+				$sub->addCommunity($com->getId());
+			}
+			else
+			{
+				ilUtil::sendFailure('Cannot assign subparticipant.');
+				return false;
+			}
+			
+			try 
+			{
+				$connector = new ilECSSubParticipantConnector(
+					ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+				);
+				$res = $connector->addSubParticipant($sub);
+			}
+			catch(ilECSConnectorException $e)
+			{
+				ilLoggerFactory::getLogger('viplab')->error('Failed with message: '. $e->getMessage());
+				exit;
+			}
+			
+			
+			// save cookie and sub_id
+			$this->setVipSubId($res->getMid());
+			$this->setVipCookie($res->getCookie());
+			ilLoggerFactory::getLogger('viplab')->debug('Recieved new cookie '. $res->getCookie());
+			ilLoggerFactory::getLogger('viplab')->debug('Recieved new  mid '. $res->getMid());
+		}		
+	}
+	
+	
+
+}
 ?>

@@ -7,12 +7,18 @@ form_tab_settings_ecs_server_info#:#Please choose one ECS-Server, which is used 
 form_tab_settings_editor#:#Editor Dimensions
 form_tab_settings_editor_width#:#Width
 form_tab_settings_editor_height#:#Height
-plang_C#:#C
-plang_C++#:#C++
-plang_Java#:#Java
-plang_DuMux#:#DuMux
-plang_Matlab#:#Matlab
-plang_Octave#:#Octave
+plang_C#:#C (Test System)
+plang_C++#:#C++ (Test System)
+plang_Java#:#Java (Test System)
+plang_DuMux#:#DuMux (Test System)
+plang_Matlab#:#Matlab (Test System)
+plang_Octave#:#Octave (Test System)
+plang_C_P#:#C (Productive System)
+plang_C++_P#:#C++ (Productive System)
+plang_Java_P#:#Java (Productive System)
+plang_DuMux_P#:#DuMux (Productive System)
+plang_Matlab_P#:#Matlab (Productive System)
+plang_Octave#_P:#Octave (Productive System)
 form_tab_settings_section_languages#:#Assignment of Programming Languages
 editor_lang#:#Programming Language
 ecs_mid#:#Mid
@@ -20,3 +26,9 @@ editor#:#Question Editor
 editor_start#:#Start Editor
 store_results#:#Save Solution Output
 store_results_info#:#If enabled, the output of the solution calculation will be stored.
+form_tab_settings_loglevel#:#Log-Level
+form_tab_settings_eval_backend#:#Evaluation Backend
+form_tab_settings_eval_backend_info#:#Choose the backend for automatic evaluations.
+auto_scoring#:#Automatic Scoring
+auto_scoring_info#:#If enabled, an automatic scoring is triggered after the submission of solutions.
+form_tab_settings_mid#:#Receiver for Scoring Results

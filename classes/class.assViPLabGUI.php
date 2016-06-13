@@ -23,9 +23,6 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	public function __construct($a_id = -1)
 	{
-		
-		$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($_REQUEST,TRUE));
-		
 		parent::__construct($a_id);
 		$this->object = new assViPLab();
 		$this->newUnitId = null;
@@ -34,11 +31,103 @@ class assViPLabGUI extends assQuestionGUI
 		{
 			$this->object->loadFromDb($a_id);
 		}
-		$this->vplugin = ilViPLabPlugin::getInstance();
+		$this->vplugin = ilassViPLabPlugin::getInstance();
 	}
 	
 	/**
-	 * @return ilViPLabPlugin
+	 * Get question tabs
+	 */
+	public function setQuestionTabs()
+	{
+		global $ilAccess, $ilTabs;
+		
+		$this->ctrl->setParameterByClass("ilAssQuestionPageGUI", "q_id", $_GET["q_id"]);
+		include_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
+		$q_type = $this->object->getQuestionType();
+
+		if (strlen($q_type))
+		{
+			$classname = $q_type . "GUI";
+			$this->ctrl->setParameterByClass(strtolower($classname), "sel_question_types", $q_type);
+			$this->ctrl->setParameterByClass(strtolower($classname), "q_id", $_GET["q_id"]);
+		}
+
+		if ($_GET["q_id"])
+		{
+			if ($ilAccess->checkAccess('write', '',$_GET["ref_id"]))
+			{
+				// edit page
+				$ilTabs->addTarget("edit_content",
+					$this->ctrl->getLinkTargetByClass("ilAssQuestionPageGUI", "edit"),
+					array("edit", "insert", "exec_pg"),
+					"", "");
+			}
+	
+			// preview page
+            $ilTabs->addTarget("preview",
+          	$this->ctrl->getLinkTargetByClass("ilAssQuestionPageGUI", "preview"),
+                array("preview"),
+                "ilAssQuestionPageGUI", "");
+         }
+
+		$force_active = false;
+		if ($ilAccess->checkAccess('write', '', $_GET["ref_id"]))
+		{
+			$url = "";
+			if ($classname) 
+			{
+				$url = $this->ctrl->getLinkTargetByClass($classname, "editQuestion");
+			}
+			$commands = $_POST["cmd"];
+			if (is_array($commands))
+			{
+				foreach ($commands as $key => $value)
+				{
+					if (preg_match("/^suggestrange_.*/", $key, $matches))
+					{
+						$force_active = true;
+					}
+				}
+			}
+			// edit question properties
+			$ilTabs->addTarget("edit_properties",
+				$url,
+				array("editQuestion", "save", "cancel", "addSuggestedSolution",
+					"cancelExplorer", "linkChilds", "removeSuggestedSolution",
+					"parseQuestion", "saveEdit", "suggestRange"),
+				$classname, "", $force_active);
+		}
+
+        // add tab for question feedback within common class assQuestionGUI
+        $this->addTab_QuestionFeedback($ilTabs);
+
+        // add tab for question hint within common class assQuestionGUI
+        $this->addTab_QuestionHints($ilTabs);
+
+		// Assessment of questions sub menu entry
+		if ($_GET["q_id"])
+		{
+			$ilTabs->addTarget("statistics",
+				$this->ctrl->getLinkTargetByClass($classname, "assessment"),
+				array("assessment"),
+				$classname, "");
+		}
+		
+		if (($_GET["calling_test"] > 0) || ($_GET["test_ref_id"] > 0))
+		{
+			$ref_id = $_GET["calling_test"];
+			if (strlen($ref_id) == 0) $ref_id = $_GET["test_ref_id"];
+			$ilTabs->setBackTarget($this->lng->txt("backtocallingtest"), "ilias.php?baseClass=ilObjTestGUI&cmd=questions&ref_id=$ref_id");
+		}
+		else
+		{
+			$ilTabs->setBackTarget($this->lng->txt("qpl"), $this->ctrl->getLinkTargetByClass("ilobjquestionpoolgui", "questions"));
+		}
+		
+	}
+	
+	/**
+	 * @return ilassViPLabPlugin
 	 */
 	protected function getPlugin()
 	{
@@ -202,6 +291,13 @@ class assViPLabGUI extends assQuestionGUI
 		$results->setValue(1);
 		$results->setChecked($this->getViPLabQuestion()->getVipResultStorage());
 		$form->addItem($results);
+		
+		$scoring = new ilCheckboxInputGUI($this->getPlugin()->txt('auto_scoring'),'auto_scoring');
+		$scoring->setInfo($this->getPlugin()->txt('auto_scoring_info'));
+		$scoring->setValue(1);
+		$scoring->setChecked($this->getViPLabQuestion()->getVipAutoScoring());
+		$form->addItem($scoring);
+		
 
 		if ($this->object->getId())
 		{
@@ -240,10 +336,10 @@ class assViPLabGUI extends assQuestionGUI
 			$applet->setVariable('VIP_WIDTH',$settings->getWidth());
 			$applet->setVariable('VIP_HEIGHT',$settings->getHeight());
 			$applet->setVariable('VIP_APPLET',$this->getPlugin()->getDirectory().'/templates/applet/TeacherApplet.jar');
-			$applet->setVariable('VIP_ECS_URL', 'https://'.ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServer());
+			$applet->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
 			$applet->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 			$applet->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
-			$applet->setVariable('VIP_LANG',$this->getViPLabQuestion()->getVipLang());
+			$applet->setVariable('VIP_LANG',$this->getViPLabQuestion()->getVipLang(true));
 			$applet->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
 			$applet->setVariable('VIP_EVALUATION',$eva_id);
 			$applet->setVariable('INITJS',$this->getPlugin()->getDirectory().'/templates');
@@ -268,6 +364,9 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	protected function initEditor()
 	{
+		ilECSViPLabRessources::deleteDeprecated();
+		
+		
 		$form = $this->initQuestionForm();
 		
 		if(!$form->checkInput())
@@ -298,33 +397,35 @@ class assViPLabGUI extends assQuestionGUI
 	
 	/**
 	 * Create a new solution
+	 * @param int active_id
+	 * @param int pass
+	 * @param bool force solution generation even for empty solutions
 	 * @return int
 	 */
-	protected function createSolution($a_active_id, $a_pass)
+	protected function createSolution($a_active_id, $a_pass = null, $a_force_empty_solution = true)
 	{
-		$sol_arr = $this->getViPLabQuestion()->getSolutionValues($a_active_id, $a_pass);
+		// always create solution
+		//$a_force_empty_solution = true;
+		
+		include_once "./Modules/Test/classes/class.ilObjTest.php";
+		if(!ilObjTest::_getUsePreviousAnswers($a_active_id, true))
+		{
+			if(is_null($a_pass))
+			{
+				$a_pass = ilObjTest::_getPass($a_active_id);
+			}
+		}
+		$sol_arr = $this->getViPLabQuestion()->getUserSolutionPreferingIntermediate($a_active_id, $a_pass);
+		
+		ilLoggerFactory::getLogger('viplab')->debug(print_r($sol_arr,true));
+		
 		$sol = (string) $sol_arr[0]['value2'];
 
-		#$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($sol,TRUE));
-
-		try 
+		if(!strlen($sol) and !$a_force_empty_solution)
 		{
-			$scon = new ilECSSolutionConnector(
-				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
-			);
-			$new_id = $scon->addSolution($sol,
-					array(
-						ilViPLabSettings::getInstance()->getLanguageMid($this->getViPLabQuestion()->getVipLang()),
-						$this->getViPLabQuestion()->getVipSubId()
-					)
-			);
-			$GLOBALS['ilLog']->write(__METHOD__.': Received new solution id '. $new_id);
-			return $new_id;
+			return 0;
 		}
-		catch (ilECSConnectorException $exception)
-		{
-			$GLOBALS['ilLog']->write(__METHOD__.': Creating solution failed with message: '. $exception);
-		}
+		return $this->getViPLabQuestion()->createSolution($sol);
 	}
 
 	/**
@@ -333,25 +434,7 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	protected function createEvaluation()
 	{
-		$eva = $this->getViPLabQuestion()->getVipEvaluation();
-		try 
-		{
-			$scon = new ilECSEvaluationConnector(
-				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
-			);
-			$new_id = $scon->addEvaluation($eva,
-					array(
-						ilViPLabSettings::getInstance()->getLanguageMid($this->getViPLabQuestion()->getVipLang()),
-						$this->getViPLabQuestion()->getVipSubId()
-					)
-			);
-			$GLOBALS['ilLog']->write(__METHOD__.': Received new evaluation id '. $new_id);
-			return $new_id;
-		}
-		catch (ilECSConnectorException $exception)
-		{
-			$GLOBALS['ilLog']->write(__METHOD__.': Creating evaluation failed with message: '. $exception);
-		}
+		return $this->getViPLabQuestion()->createEvaluation();
 	}
 	
 	/**
@@ -360,108 +443,21 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	protected function createResult($a_active_id, $a_pass)
 	{
-		$result_arr = $this->getViPLabQuestion()->getSolutionValues($a_active_id, $a_pass);
-		if(isset($result_arr[1]))
-		{
-			$result_string = $result_arr[1]['value2'];
-		}
-		#$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($result_str,TRUE));
-		try 
-		{
-			$scon = new ilECSVipResultConnector(
-				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
-			);
-			
-			$new_id = $scon->addResult($result_string,
-					array(
-						ilViPLabSettings::getInstance()->getLanguageMid($this->getViPLabQuestion()->getVipLang()),
-						$this->getViPLabQuestion()->getVipSubId()
-					)
-			);
-			$GLOBALS['ilLog']->write(__METHOD__.': Received new result id '. $new_id);
-			return $new_id;
-		}
-		catch (ilECSConnectorException $exception)
-		{
-			$GLOBALS['ilLog']->write(__METHOD__.': Creating evaluation failed with message: '. $exception);
-		}
+		$this->getViPLabQuestion()->createResult($a_active_id, $a_pass);
 	}
 
+	/**
+	 * Create exercise
+	 */
 	protected function createExercise()
 	{
-		if(strlen($this->getViPLabQuestion()->getVipExercise()))
-		{
-			$exc = $this->getViPLabQuestion()->getVipExercise();
-		}
-		else
-		{
-			$exc = '';
-		}
-		try
-		{
-			$econ = new ilECSExerciseConnector(
-						ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
-			);
-			
-			$new_id = $econ->addExercise($exc,
-					array(
-						ilViPLabSettings::getInstance()->getLanguageMid($this->getViPLabQuestion()->getVipLang()),
-						$this->getViPLabQuestion()->getVipSubId()
-					)
-			);
-			$this->getViPLabQuestion()->setVipExerciseId($new_id);
-			#$this->getViPLabQuestion()->saveToDb();
-		}
-		catch (ilECSConnectorException $exception)
-		{
-			$GLOBALS['ilLog']->write(__METHOD__.': Creating exercise failed with message: '. $exception);
-		}
+		$this->getViPLabQuestion()->createExercise();
 	}
 	
 
 	protected function addSubParticipant()
 	{
-		if(!$this->getViPLabQuestion()->getVipSubId())
-		{
-			$sub = new ilECSSubParticipant();
-			$com = ilViPLabUtil::lookupCommunityByMid(
-				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer()),
-				ilViPLabSettings::getInstance()->getLanguageMid($this->getViPLabQuestion()->getVipLang())
-			);
-			if($com instanceof ilECSCommunity)
-			{
-				$GLOBALS['ilLog']->write(__METHOD__.': Current community = '. $com->getId());
-				$sub->addCommunity($com->getId());
-			}
-			else
-			{
-				ilUtil::sendFailure('Cannot assign subparticipant.');
-				return $this->editQuestion();
-			}
-			
-			try 
-			{
-				$connector = new ilECSSubParticipantConnector(
-					ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
-				);
-				$res = $connector->addSubParticipant($sub);
-			}
-			catch(ilECSConnectorException $e)
-			{
-				$GLOBALS['ilLog']->write(__METHOD__.': Failed with message: '. $e->getMessage());
-				exit;
-			}
-			
-			$GLOBALS['ilLog']->write(__METHOD__.': *********************************************** ');
-			
-			// save cookie and sub_id
-			$this->getViPLabQuestion()->setVipSubId($res->getMid());
-			$this->getViPLabQuestion()->setVipCookie($res->getCookie());
-			#$GLOBALS['ilLog']->write(__METHOD__.': DEBUG '. print_r($res,TRUE));
-			$GLOBALS['ilLog']->write(__METHOD__.': Received new cookie '.$res->getCookie());
-			$GLOBALS['ilLog']->write(__METHOD__.': Received new mid    '.$res->getMid());
-			$GLOBALS['ilLog']->write(__METHOD__.': *********************************************** ');
-		}		
+		return $this->getViPLabQuestion()->addSubParticipant();
 	}
 
 	/**
@@ -535,10 +531,16 @@ class assViPLabGUI extends assQuestionGUI
 		$this->getViPLabQuestion()->setQuestion($form->getInput('question'));
 		$this->getViPLabQuestion()->setPoints($form->getInput('points'));
 		$this->getViPLabQuestion()->setVipExercise($form->getInput('vipexercise'));
-		$this->getViPLabQuestion()->setVipEvaluation($form->getInput('vipevaluation'));
-		$this->getViPLabQuestion()->setVipResultStorage($form->getInput('result_storing'));
 		
-		$GLOBALS['ilLog']->write(__METHOD__.': '.$form->getInput('vipexercise'));
+		$evaluation = ilViPLabUtil::extractJsonFromCustomZip($form->getInput('vipevaluation'));
+		$this->getViPLabQuestion()->setVipEvaluation($evaluation);
+		
+		
+		
+		$this->getViPLabQuestion()->setVipResultStorage($form->getInput('result_storing'));
+		$this->getViPLabQuestion()->setVipAutoScoring($form->getInput('auto_scoring'));
+		
+		ilLoggerFactory::getLogger('viplab')->debug(print_r($form->getInput('vipexercise'),true));
 		
 		$this->getViPLabQuestion()->setEstimatedWorkingTime(
 			$_POST["Estimated"]["hh"],
@@ -560,7 +562,13 @@ class assViPLabGUI extends assQuestionGUI
 	}
 
 	// preview 
-	public function getPreview($a_show_question_only = FALSE)
+	/**
+	 * Preview of question
+	 * @param type $a_show_question_only
+	 * @param type $showInlineFeedback
+	 * @return type
+	 */
+	public function getPreview($a_show_question_only = FALSE, $showInlineFeedback = FALSE)
 	{
 		include_once './Services/UICore/classes/class.ilTemplate.php';
 		$template = $this->getPlugin()->getTemplate('tpl.il_as_viplab_preview.html');
@@ -568,59 +576,95 @@ class assViPLabGUI extends assQuestionGUI
 				$this->getViPLabQuestion()->prepareTextareaOutput(
 						$this->getViPLabQuestion()->getQuestion())
 		);
-		$preview = $template->get();
 		
-		if(!$a_show_question_only)
+		if($a_show_question_only)
 		{
-			$preview = $this->getILIASPage($preview);
+			$preview = $template->get();
+			return $template->get();
 		}
-		return $preview;
-	}
-
-	/**
-	 * Show question stuff
-	 * @param type $formaction
-	 * @param type $active_id
-	 * @param type $pass
-	 * @param type $is_postponed
-	 * @param type $use_post_solutions
-	 * @param type $show_feedback
-	 */
-	public function outQuestionForTest($formaction, $active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
-	{
-		$GLOBALS['ilLog']->write(__METHOD__.' ##################### out question');
 		
+		$template->setCurrentBlock('complete');
 		
 		$settings = ilViPLabSettings::getInstance();
+		$this->addSubParticipant();
+		$this->createExercise();
 		
+		$template->setVariable('VIP_ID', $this->getViPLabQuestion()->getId());
+		$template->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
+		$template->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
+		$template->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
+		$template->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
+		$template->setVariable('INITJS',$this->getPlugin()->getDirectory().'/templates');
+		
+		$template->parseCurrentBlock();
+		
+		
+		$preview = $template->get();
+		$preview = $this->getILIASPage($preview);
+		
+		$GLOBALS['tpl']->addJavaScript($this->getPlugin()->getDirectory().'/js/question_init.js');
+		
+		return $preview;
+	}
+	
+	/**
+	 * New implementation get testoutput
+	 * @param type $active_id
+	 * @param type $pass
+	 * @param type $is_question_postponed
+	 * @param type $user_post_solutions
+	 * @param type $show_specific_inline_feedback
+	 * @return type
+	 */
+	public function getTestOutput($active_id, $pass, $is_question_postponed, $user_post_solutions, $show_specific_inline_feedback)
+	{
+
+		$settings = ilViPLabSettings::getInstance();
 		$this->addSubParticipant();
 		$this->createExercise();
 
-		$atpl = ilViPLabPlugin::getInstance()->getTemplate('tpl.applet_question.html');
+		ilLoggerFactory::getLogger('viplab')->debug('VipCookie: '. $this->getViPLabQuestion()->getVipCookie());
+		
+		$atpl = ilassViPLabPlugin::getInstance()->getTemplate('tpl.applet_question.html');
+
+		// What happens if has no solution, answers questions => and clicks "Calculate"?
+		$sol_id = $this->createSolution($active_id, $pass, false);
+
 		
 		$atpl->setVariable('QUESTIONTEXT', $this->getViPLabQuestion()->prepareTextareaOutput($this->getViPLabQuestion()->getQuestion(), TRUE));
 		$atpl->setVariable('VIP_APPLET_URL',$this->getPlugin()->getDirectory().'/templates/applet/StudentApplet.jar');
 		$atpl->setVariable('VIP_WIDTH',$settings->getWidth());
 		$atpl->setVariable('VIP_HEIGHT',$settings->getHeight());
 		$atpl->setVariable('VIP_APPLET',$this->getPlugin()->getDirectory().'/templates/applet/StudentApplet.jar');
-		$atpl->setVariable('VIP_ECS_URL', 'https://'.ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServer());
+		$atpl->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
 		$atpl->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 		$atpl->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
 		$atpl->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
+		
+		if($sol_id)
+		{
+			$atpl->setVariable('VIP_SOLUTION', ilECSSolutionConnector::RESOURCE_PATH.'/'.$sol_id);
+		}
+		
+
 		$atpl->setVariable('INITJS',$this->getPlugin()->getDirectory().'/templates');
 		
 		
 		$atpl->setVariable('VIP_STORED_EXERCISE', $this->getViPLabQuestion()->getVipExerciseId());
 		$atpl->setVariable('VIP_STORED_PARTICIPANT',$this->getViPLabQuestion()->getVipSubId());
 		
-		$pageoutput = $this->outQuestionPage("", $is_postponed, $active_id, $atpl->get());
-
-		$this->tpl->setVariable('QUESTION_OUTPUT',$pageoutput);
-		$this->tpl->setVariable('FORMACTION',$formaction);
+		// add solution 
+		if($sol_id)
+		{
+			$atpl->setVariable('VIP_STORED_SOLUTION',$sol_id);
+		}
+		
+		$pageoutput = $this->outQuestionPage("", $is_question_postponed, $active_id, $atpl->get());
 		
 		$GLOBALS['tpl']->addJavaScript($this->getPlugin()->getDirectory().'/js/question_init.js');
+		return $pageoutput;
 	}
-
+	
 
 	/**
 	 * Show solution output
@@ -666,7 +710,7 @@ class assViPLabGUI extends assQuestionGUI
 			$this->getViPLabQuestion()->deleteExercise();
 			$this->createExercise();
 			
-			$sol_id = $this->createSolution($active_id, $pass);
+			$sol_id = $this->createSolution($active_id, $pass, true);
 			$eva_id = $this->createEvaluation();
 			
 			$settings = ilViPLabSettings::getInstance();
@@ -674,11 +718,11 @@ class assViPLabGUI extends assQuestionGUI
 			$soltpl->setCurrentBlock('complete');
 			$soltpl->setVariable('VIP_APP_ID',$this->getViPLabQuestion()->getId());
 			$soltpl->setVariable('VIP_APPLET_URL',$this->getPlugin()->getDirectory().'/templates/applet/TeacherApplet.jar');
-			$soltpl->setVariable('VIP_ECS_URL', 'https://'.ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServer());
+			$soltpl->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
 			$soltpl->setVariable('VIP_WIDTH',$settings->getWidth());
 			$soltpl->setVariable('VIP_HEIGHT',$settings->getHeight());
 			$soltpl->setVariable('VIP_APPLET',$this->getPlugin()->getDirectory().'/templates/applet/TeacherApplet.jar');
-			$soltpl->setVariable('VIP_ECS_URL', 'https://'.ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServer());
+			$soltpl->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
 			$soltpl->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 			$soltpl->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
 			$soltpl->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
@@ -696,7 +740,7 @@ class assViPLabGUI extends assQuestionGUI
 				$soltpl->setVariable('VIP_RESULT', '');
 			}
 			
-			$soltpl->setVariable('VIP_LANG',$this->getViPLabQuestion()->getVipLang());
+			$soltpl->setVariable('VIP_LANG',$this->getViPLabQuestion()->getVipLang(true));
 
 			$soltpl->setVariable('VIP_STORED_EXERCISE', $this->getViPLabQuestion()->getVipExerciseId());
 			$soltpl->setVariable('VIP_STORED_PARTICIPANT',$this->getViPLabQuestion()->getVipSubId());
@@ -723,7 +767,7 @@ class assViPLabGUI extends assQuestionGUI
 	public function getSpecificFeedbackOutput($active_id, $pass)
 	{
 	}
-	
-	
+
+
 }
 ?>

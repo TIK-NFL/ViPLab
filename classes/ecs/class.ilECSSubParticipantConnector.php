@@ -30,9 +30,7 @@ class ilECSSubParticipantConnector extends ilECSConnector
 	 */
 	public function addSubParticipant(ilECSSubParticipant $sub)
 	{
-		global $ilLog;
-		
-		$ilLog->write(__METHOD__.': Add new sub participant resource...');
+		ilLoggerFactory::getLogger('viplab')->debug('Add new sub participant resource...');
 
 	 	$this->path_postfix = self::RESOURCE_PATH;
 	 	
@@ -51,21 +49,25 @@ class ilECSSubParticipantConnector extends ilECSConnector
 
 			$info = $this->curl->getInfo(CURLINFO_HTTP_CODE);
 	
-			$ilLog->write(__METHOD__.': Checking HTTP status...');
+			ilLoggerFactory::getLogger('viplab')->debug('Checking HTTP status...');
 			if($info != self::HTTP_CODE_CREATED && $info != self::HTTP_CODE_OK)
 			{
-				$ilLog->write(__METHOD__.': Cannot create sub participant, did not receive HTTP 201. ');
-				$ilLog->write(__METHOD__.': POST was: '. json_encode($sub));
-				$ilLog->write(__METHOD__.': HTTP code: '.$info);
+				ilLoggerFactory::getLogger('viplab')->error('Cannot create subparticipant, did not recieve HTTP 201.');
+				ilLoggerFactory::getLogger('viplab')->error('POST was: ' . json_encode($sub));
+				ilLoggerFactory::getLogger('viplab')->error('HTTP code was: ' . $info);
 				throw new ilECSConnectorException('Received HTTP status code: '.$info);
 			}
-			$ilLog->write(__METHOD__.': ... got HTTP 201 (created)');
-
-			#$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($ret,TRUE));
 			
+			ilLoggerFactory::getLogger('viplab')->debug('...got HTTP 201 (created)');
+
 			$result = $this->parseResponse($ret);
 			
-			#$ilLog->write(__METHOD__.': ... got cookie: '.$result->getCookie());
+			// store new ressource
+			$ressource = new ilECSViPLabRessource();
+			$ressource->setRessourceId($result->getMid());
+			$ressource->setRessourceType(ilECSViPLabRessource::RES_SUBPARTICIPANT);
+			$ressource->create();
+			
 			return $result;
 	 	}
 	 	catch(ilCurlConnectionException $exc)
@@ -81,7 +83,7 @@ class ilECSSubParticipantConnector extends ilECSConnector
 	 */
 	public function deleteSubParticipant($a_sub_id)
 	{
-		$GLOBALS['ilLog']->write(__METHOD__.': Delete subparticipant with id '. $a_sub_id  );
+		ilLoggerFactory::getLogger('viplab')->debug('Delete subparticipant with id: '. $a_sub_id);
 	 	$this->path_postfix = self::RESOURCE_PATH;
 	 	
 	 	if($a_sub_id)
@@ -118,10 +120,6 @@ class ilECSSubParticipantConnector extends ilECSConnector
 		// parse location
 		$headers = $ecs_result->getHeaders();
 		$location  = $headers['Location'];
-		
-		#$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($headers,TRUE));
-		#$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($ecs_result->getPlainResultString(),TRUE));
-		#$GLOBALS['ilLog']->write(__METHOD__.': '.print_r(end(split('/',$location)),TRUE));
 		
 		$id = end(split('/',$location));
 		

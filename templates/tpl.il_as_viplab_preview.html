@@ -1,1 +1,42 @@
 {QUESTION_TEXT}
+<!-- BEGIN complete -->
+<div id="student_applet_placeholder{VIP_ID}" style="width: 90%; height: 80vh">
+<div border="1" id="student_applet_toggle{VIP_ID}" style="position: absolute; width: 90%; height: 80vh">
+<!--                                           -->
+<!-- This script loads your compiled module.   -->
+<!-- If you add any GWT meta tags, they must   -->
+<!-- be added before this line.                -->
+<!--                                           -->
+    <meta name="gwt:property" content="locale=<%=request.getLocale()%>">
+    <meta name="viplab:exercise" content="{VIP_EXERCISE}"> 
+    <meta name="viplab:ecslocation" content="{VIP_ECS_URL}/numlab">
+    <meta name="viplab:cookie" content="{VIP_COOKIE}">
+    <meta name="viplab:compmid" content="{VIP_MID}">
+	<meta name="viplab:readonly" content="true">
+    <meta name="viplab:container" content="student_applet_toggle{VIP_ID}">
+    <script type="text/javascript" language="javascript" src="{INITJS}/viplab/viplab.nocache.js"></script>
+    <script src="{INITJS}/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{INITJS}/ace/theme-eclipse.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{INITJS}/ace/theme-katzenmilch.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{INITJS}/ace/mode-java.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{INITJS}/ace/mode-c_cpp.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{INITJS}/ace/mode-matlab.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{INITJS}/ace/mode-text.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{INITJS}/ace/mode-r.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{INITJS}/ace/mode-plain_text.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{INITJS}/jszip/jszip.min.js" type="text/javascript" charset="utf-8"></script>
+    <!--                                           -->
+    <!-- The body can have arbitrary html, or      -->
+    <!-- you can leave the body empty if you want  -->
+    <!-- to create a completely dynamic UI.        -->
+    <!--                                           -->
+    <!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
+    <noscript>
+      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+        Your web browser must have JavaScript enabled
+        in order for this application to display correctly.
+      </div>
+    </noscript>
+</div>
+</div>
+<!-- END complete -->

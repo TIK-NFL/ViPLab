@@ -21,6 +21,11 @@ class ilViPLabSettings
 	private $height = 600;
 	private $languages = array();
 	
+	private $evaluation_mid = 0;
+	private $evaluation_receiver_mid = 0;
+	
+	private $log_level;
+	
 	
 	/**
 	 * Singeleton constructor
@@ -109,6 +114,36 @@ class ilViPLabSettings
 		return 0;
 	}
 	
+	public function getLogLevel()
+	{
+		return $this->log_level;
+	}
+	
+	public function setLogLevel($a_level)
+	{
+		$this->log_level = $a_level;
+	}
+	
+	public function setEvaluationMid($a_mid)
+	{
+		$this->evaluation_mid = $a_mid;
+	}
+	
+	public function getEvaluationMid()
+	{
+		return $this->evaluation_mid;
+	}
+	
+	public function setEvaluationReceiverMid($a_mid)
+	{
+		$this->evaluation_receiver_mid = $a_mid;
+	}
+	
+	public function getEvaluationReceiverMid()
+	{
+		return $this->evaluation_receiver_mid;
+	}
+	
 	/**
 	 * Update settings
 	 */
@@ -121,6 +156,9 @@ class ilViPLabSettings
 		
 		$ser_language = serialize($this->getLanguages());
 		$this->getStorage()->set('languages',$ser_language);
+		$this->getStorage()->set('log_level', $this->getLogLevel());
+		$this->getStorage()->set('evaluation_mid', $this->getEvaluationMid());
+		$this->getStorage()->set('evaluation_receiver_mid', $this->getEvaluationReceiverMid());
 	}
 	
 	/**
@@ -143,6 +181,9 @@ class ilViPLabSettings
 		$this->setWidth($this->getStorage()->get('width',$this->width));
 		$this->setHeight($this->getStorage()->get('height',$this->height));
 		$this->setLanguages(unserialize($this->getStorage()->get('languages',serialize($this->languages))));
+		$this->setLogLevel($this->getStorage()->get('log_level',$this->log_level));
+		$this->setEvaluationMid($this->getStorage()->get('evaluation_mid'), $this->evaluation_mid);
+		$this->setEvaluationReceiverMid($this->getStorage()->get('evaluation_receiver_mid',$this->evaluation_receiver_mid));
 	}
 }
 ?>
