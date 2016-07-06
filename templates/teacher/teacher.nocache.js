@@ -431,21 +431,21 @@ function teacher(){
     }
     var strongName;
     try {
-      unflattenKeylistIntoAnswers(['en', 'ie9'], '0BF2717376F22672BC0B2112DF02926F');
-      unflattenKeylistIntoAnswers(['default', 'ie10'], '0FBF9C437B339027B9549E665201680F');
       unflattenKeylistIntoAnswers(['de', 'ie9'], '14ADBF0B1EB235F1F84ED79E9678F0A5');
+      unflattenKeylistIntoAnswers(['default', 'safari'], '18F6BBF64F174ADC1019494868ED103F');
       unflattenKeylistIntoAnswers(['en', 'safari'], '1A8F0CAF3359048AB5F323040FB5ABE2');
-      unflattenKeylistIntoAnswers(['default', 'gecko1_8'], '1FFC3950230E8D773E4A2D91D4CED2ED');
       unflattenKeylistIntoAnswers(['default', 'ie9'], '33323D3859672198978C07D522F6692C');
       unflattenKeylistIntoAnswers(['en', 'gecko1_8'], '34C893DA8ABFABD844AF539DCC8A3C1D');
       unflattenKeylistIntoAnswers(['en', 'ie8'], '3604E34885D19096EF777699C580DF7D');
+      unflattenKeylistIntoAnswers(['de', 'gecko1_8'], '4C7529BAD2256A6CD29275C8C672E497');
       unflattenKeylistIntoAnswers(['de', 'ie10'], '715713987AB7D3E6734D948907901F76');
       unflattenKeylistIntoAnswers(['default', 'ie8'], '85834A441AD91F709FF0D9FFCEB51209');
-      unflattenKeylistIntoAnswers(['de', 'safari'], '880D1D2DC05292F9480A3EE069FD8FC1');
+      unflattenKeylistIntoAnswers(['en', 'ie9'], '887B2162825E9B82675E84459A8BC0EB');
+      unflattenKeylistIntoAnswers(['default', 'gecko1_8'], '92479FD13D5EBBBBA690DAB40ABE7EEF');
       unflattenKeylistIntoAnswers(['en', 'ie10'], '9E9AEA7FC82668A5FF2EBA328C5F691F');
-      unflattenKeylistIntoAnswers(['de', 'gecko1_8'], 'B152375986F493874BA2BBB054E45D9B');
       unflattenKeylistIntoAnswers(['de', 'ie8'], 'B776E7E99C64C61D12272303080D6418');
-      unflattenKeylistIntoAnswers(['default', 'safari'], 'CBD462106E2EF4461893BF6460FF7DC8');
+      unflattenKeylistIntoAnswers(['de', 'safari'], 'CA612969F46B61BAFB92B7AA11735F0A');
+      unflattenKeylistIntoAnswers(['default', 'ie10'], 'F3F82B382A27CA13BC1F303433566AEA');
       strongName = answers[computePropValue('locale')][computePropValue('user.agent')];
       var idx = strongName.indexOf(':');
       if (idx != -1) {
