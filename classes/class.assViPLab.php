@@ -42,7 +42,7 @@ class assViPLab extends assQuestion
 	private $vip_exercise = '';
 	private $vip_evaluation = '';
 	private $vip_exercise_id = 0;
-	private $vip_auto_scoring = false;
+	private $vip_auto_scoring = true;
 
 	
 	private $plugin;
