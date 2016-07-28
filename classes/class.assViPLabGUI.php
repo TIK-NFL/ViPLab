@@ -572,16 +572,13 @@ class assViPLabGUI extends assQuestionGUI
 	{
 		include_once './Services/UICore/classes/class.ilTemplate.php';
 		$template = $this->getPlugin()->getTemplate('tpl.il_as_viplab_preview.html');
-		$template->setVariable('QUESTION_TEXT', 
-				$this->getViPLabQuestion()->prepareTextareaOutput(
-						$this->getViPLabQuestion()->getQuestion())
-		);
 		
-		if($a_show_question_only)
-		{
-			$preview = $template->get();
-			return $template->get();
-		}
+		$template->setVariable(
+			'QUESTIONTEXT', 
+			$this->getViPLabQuestion()->prepareTextareaOutput(
+				$this->getViPLabQuestion()->getQuestion(), 
+				true)
+		);
 		
 		$template->setCurrentBlock('complete');
 		
@@ -600,7 +597,11 @@ class assViPLabGUI extends assQuestionGUI
 		
 		
 		$preview = $template->get();
-		$preview = $this->getILIASPage($preview);
+		if(!$a_show_question_only)
+		{
+			$preview = $this->getILIASPage($preview);
+		}
+		
 		
 		$GLOBALS['tpl']->addJavaScript($this->getPlugin()->getDirectory().'/js/question_init.js');
 		

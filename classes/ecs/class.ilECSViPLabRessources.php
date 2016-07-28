@@ -9,7 +9,7 @@
  */
 class ilECSViPLabRessources
 {
-	const MAX_AGE_SECONDS = 60;
+	const MAX_AGE_SECONDS = 10800;
 
 	/**
 	 * Get ressources

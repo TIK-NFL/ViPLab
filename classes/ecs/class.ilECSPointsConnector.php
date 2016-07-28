@@ -32,6 +32,8 @@ class ilECSPointsConnector extends ilECSConnector
 	{
 		$this->path_postfix = self::RESOURCE_PATH.'/'.$a_id;
 
+		ilLoggerFactory::getLogger('viplab')->debug('getPoints() using uri:' . $this->getServer()->getServerURI().$this->path_postfix);
+		
 		try {
 			$this->prepareConnection();
 			$this->addHeader('Content-Type', 'application/json');
