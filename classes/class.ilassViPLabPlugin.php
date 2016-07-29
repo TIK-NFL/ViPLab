@@ -120,7 +120,7 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 				$received_points,
 				assQuestion::_getMaximumPoints($qid),
 				$pass,
-				false,
+				true,
 				true
 			);
 			// todo lp status wrapper
