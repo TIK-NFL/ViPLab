@@ -23,9 +23,6 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	public function __construct($a_id = -1)
 	{
-		
-		$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($_REQUEST,TRUE));
-		
 		parent::__construct($a_id);
 		$this->object = new assViPLab();
 		$this->newUnitId = null;
@@ -393,15 +390,32 @@ class assViPLabGUI extends assQuestionGUI
 	
 	/**
 	 * Create a new solution
+	 * @param int active_id
+	 * @param int pass
+	 * @param bool force solution generation even for empty solutions
 	 * @return int
 	 */
-	protected function createSolution($a_active_id, $a_pass)
+	protected function createSolution($a_active_id, $a_pass = null, $a_force_empty_solution = true)
 	{
-		$sol_arr = $this->getViPLabQuestion()->getSolutionValues($a_active_id, $a_pass);
+		include_once "./Modules/Test/classes/class.ilObjTest.php";
+		if(!ilObjTest::_getUsePreviousAnswers($a_active_id, true))
+		{
+			if(is_null($a_pass))
+			{
+				$pass = ilObjTest::_getPass($a_active_id);
+			}
+		}
+		$sol_arr = $this->getViPLabQuestion()->getUserSolutionPreferingIntermediate($a_active_id, $a_pass);
+		
+		ilLoggerFactory::getLogger('viplab')->debug(print_r($sol_arr,true));
+		
 		$sol = (string) $sol_arr[0]['value2'];
 
-		#$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($sol,TRUE));
-
+		if(!strlen($sol) and !$a_force_empty_solution)
+		{
+			return 0;
+		}
+		
 		try 
 		{
 			$scon = new ilECSSolutionConnector(
@@ -413,12 +427,12 @@ class assViPLabGUI extends assQuestionGUI
 						$this->getViPLabQuestion()->getVipSubId()
 					)
 			);
-			$GLOBALS['ilLog']->write(__METHOD__.': Received new solution id '. $new_id);
+			ilLoggerFactory::getLogger('viplab')->debug('Received new solution id ' . $new_id);
 			return $new_id;
 		}
 		catch (ilECSConnectorException $exception)
 		{
-			$GLOBALS['ilLog']->write(__METHOD__.': Creating solution failed with message: '. $exception);
+			ilLoggerFactory::getLogger('viplab')->error('Creating solution failed with message: '. $exception);
 		}
 	}
 
@@ -440,12 +454,12 @@ class assViPLabGUI extends assQuestionGUI
 						$this->getViPLabQuestion()->getVipSubId()
 					)
 			);
-			$GLOBALS['ilLog']->write(__METHOD__.': Received new evaluation id '. $new_id);
+			ilLoggerFactory::getLogger('viplab')->debug('Received new evaluation id ' . $new_id);
 			return $new_id;
 		}
 		catch (ilECSConnectorException $exception)
 		{
-			$GLOBALS['ilLog']->write(__METHOD__.': Creating evaluation failed with message: '. $exception);
+			ilLoggerFactory::getLogger('viplab')->error('Creating evaluation failed with message: '. $exception);
 		}
 	}
 	
@@ -460,7 +474,6 @@ class assViPLabGUI extends assQuestionGUI
 		{
 			$result_string = $result_arr[1]['value2'];
 		}
-		#$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($result_str,TRUE));
 		try 
 		{
 			$scon = new ilECSVipResultConnector(
@@ -473,12 +486,12 @@ class assViPLabGUI extends assQuestionGUI
 						$this->getViPLabQuestion()->getVipSubId()
 					)
 			);
-			$GLOBALS['ilLog']->write(__METHOD__.': Received new result id '. $new_id);
+			ilLoggerFactory::getLogger('viplab')->debug('Received new result id ' . $new_id);
 			return $new_id;
 		}
 		catch (ilECSConnectorException $exception)
 		{
-			$GLOBALS['ilLog']->write(__METHOD__.': Creating evaluation failed with message: '. $exception);
+			ilLoggerFactory::getLogger('viplab')->error('Creating result failed with message: '. $exception);
 		}
 	}
 
@@ -509,7 +522,7 @@ class assViPLabGUI extends assQuestionGUI
 		}
 		catch (ilECSConnectorException $exception)
 		{
-			$GLOBALS['ilLog']->write(__METHOD__.': Creating exercise failed with message: '. $exception);
+			ilLoggerFactory::getLogger('viplab')->error('Creating exercise failed with message: '. $exception);
 		}
 	}
 	
@@ -526,7 +539,7 @@ class assViPLabGUI extends assQuestionGUI
 			);
 			if($com instanceof ilECSCommunity)
 			{
-				$GLOBALS['ilLog']->write(__METHOD__.': Current community = '. $com->getId());
+				ilLoggerFactory::getLogger('viplab')->debug('Current community = ' . $com->getId());
 				$sub->addCommunity($com->getId());
 			}
 			else
@@ -544,19 +557,16 @@ class assViPLabGUI extends assQuestionGUI
 			}
 			catch(ilECSConnectorException $e)
 			{
-				$GLOBALS['ilLog']->write(__METHOD__.': Failed with message: '. $e->getMessage());
+				ilLoggerFactory::getLogger('viplab')->error('Failed with message: '. $e->getMessage());
 				exit;
 			}
 			
-			$GLOBALS['ilLog']->write(__METHOD__.': *********************************************** ');
 			
 			// save cookie and sub_id
 			$this->getViPLabQuestion()->setVipSubId($res->getMid());
 			$this->getViPLabQuestion()->setVipCookie($res->getCookie());
-			#$GLOBALS['ilLog']->write(__METHOD__.': DEBUG '. print_r($res,TRUE));
-			$GLOBALS['ilLog']->write(__METHOD__.': Received new cookie '.$res->getCookie());
-			$GLOBALS['ilLog']->write(__METHOD__.': Received new mid    '.$res->getMid());
-			$GLOBALS['ilLog']->write(__METHOD__.': *********************************************** ');
+			ilLoggerFactory::getLogger('viplab')->debug('Recieved new cookie '. $res->getCookie());
+			ilLoggerFactory::getLogger('viplab')->debug('Recieved new  mid '. $res->getMid());
 		}		
 	}
 
@@ -634,7 +644,7 @@ class assViPLabGUI extends assQuestionGUI
 		$this->getViPLabQuestion()->setVipEvaluation($form->getInput('vipevaluation'));
 		$this->getViPLabQuestion()->setVipResultStorage($form->getInput('result_storing'));
 		
-		$GLOBALS['ilLog']->write(__METHOD__.': '.$form->getInput('vipexercise'));
+		ilLoggerFactory::getLogger('viplab')->debug(print_r($form->getInput('vipexercise'),true));
 		
 		$this->getViPLabQuestion()->setEstimatedWorkingTime(
 			$_POST["Estimated"]["hh"],
@@ -685,13 +695,12 @@ class assViPLabGUI extends assQuestionGUI
 	public function getTestOutput($active_id, $pass, $is_question_postponed, $user_post_solutions, $show_specific_inline_feedback)
 	{
 
-		$GLOBALS['ilLog']->write(__METHOD__.' ##################### out question');
 		$settings = ilViPLabSettings::getInstance();
 		$this->addSubParticipant();
 		$this->createExercise();
 
+		ilLoggerFactory::getLogger('viplab')->debug('VipCookie: '. $this->getViPLabQuestion()->getVipCookie());
 		
-		$GLOBALS['ilLog']->write(__METHOD__.':************************************************ '.$this->getViPLabQuestion()->getVipCookie());
 		$atpl = ilassViPLabPlugin::getInstance()->getTemplate('tpl.applet_question.html');
 		
 		$atpl->setVariable('QUESTIONTEXT', $this->getViPLabQuestion()->prepareTextareaOutput($this->getViPLabQuestion()->getQuestion(), TRUE));
@@ -709,8 +718,20 @@ class assViPLabGUI extends assQuestionGUI
 		$atpl->setVariable('VIP_STORED_EXERCISE', $this->getViPLabQuestion()->getVipExerciseId());
 		$atpl->setVariable('VIP_STORED_PARTICIPANT',$this->getViPLabQuestion()->getVipSubId());
 		
+		// add solution 
+		$sol_id = $this->createSolution($active_id, $pass, false);
+		if($sol_id)
+		{
+			$atpl->setVariable(
+					'VIP_STORED_SOLUTION',
+					ilECSSolutionConnector::RESOURCE_PATH.'/'.$sol_id
+			);
+		}
+		
+		$pageoutput = $this->outQuestionPage("", $is_question_postponed, $active_id, $atpl->get());
+		
 		$GLOBALS['tpl']->addJavaScript($this->getPlugin()->getDirectory().'/js/question_init.js');
-		return $atpl->get();
+		return $pageoutput;
 	}
 	
 
@@ -758,7 +779,7 @@ class assViPLabGUI extends assQuestionGUI
 			$this->getViPLabQuestion()->deleteExercise();
 			$this->createExercise();
 			
-			$sol_id = $this->createSolution($active_id, $pass);
+			$sol_id = $this->createSolution($active_id, $pass, true);
 			$eva_id = $this->createEvaluation();
 			
 			$settings = ilViPLabSettings::getInstance();

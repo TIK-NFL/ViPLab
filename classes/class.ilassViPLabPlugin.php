@@ -59,6 +59,11 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 	protected function init()
 	{
 		$this->initAutoLoad();
+		// set configured log level
+		foreach(ilLoggerFactory::getLogger('viplab')->getLogger()->getHandlers() as $handler)
+		{
+			$handler->setLevel(ilViPLabSettings::getInstance()->getLogLevel());
+		}
 	}
 		
 	/**

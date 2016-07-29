@@ -22,15 +22,23 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		global $ilTabs;
 
 		$ilTabs->addTab(
-			'settings',
+			'tab_settings',
 			ilassViPLabPlugin::getInstance()->txt('tab_settings'),
 			$GLOBALS['ilCtrl']->getLinkTarget($this,'configure')
 		);
+		/*
+		$ilTabs->addTab(
+			'tab_ecs_ressources',
+			ilassViPLabPlugin::getInstance()->txt('tab_ecs_ressources'),
+			$GLOBALS['ilCtrl']->getLinkTarget($this, 'listEcsRessources')
+		);
+		 */
 
 		switch ($cmd)
 		{
 			case "configure":
 			case "save":
+			case 'listEcsRessources':
 				$this->$cmd();
 				break;
 
@@ -42,6 +50,8 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 	 */
 	protected function configure(ilPropertyFormGUI $form = null)
 	{
+		$GLOBALS['ilTabs']->activateTab('tab_settings');
+		
 		if(!$form instanceof ilPropertyFormGUI)
 		{
 			$form = $this->initConfigurationForm();
@@ -67,6 +77,12 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		$active->setChecked($settings->isActive());
 		$form->addItem($active);
 		
+		// log level
+		$GLOBALS['lng']->loadLanguageModule('log');
+		$level = new ilSelectInputGUI($this->getPluginObject()->txt('form_tab_settings_loglevel'),'log_level');
+		$level->setOptions(ilLogLevel::getLevelOptions());
+		$level->setValue($settings->getLogLevel());
+		$form->addItem($level);
 		
 		// ecs servers
 		include_once './Services/WebServices/ECS/classes/class.ilECSServerSettings.php';
@@ -137,6 +153,21 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		return $form;
 	}
 	
+	
+	/**
+	 * Show ecs ressource table
+	 */
+	protected function listEcsRessources()
+	{
+		$GLOBALS['ilTabs']->activateTab('tab_ecs_ressources');
+		
+		$table = new ilEcsRessourcesTableGUI($this, 'listEcsRessources');
+		$table->init();
+		$table->parse();
+		
+		$GLOBALS['tpl']->setContent($table->getHTML());
+	}
+	
 	/**
 	 * Read available mids
 	 * @param ilViPLabSettings $settings
@@ -159,7 +190,7 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		$options = array();
 		$options[0] = $GLOBALS['lng']->txt('select_one');
 		
-		foreach($participants as $mid => $part)
+		foreach((array) $participants as $mid => $part)
 		{
 			if($part->isSelf())
 			{
@@ -182,6 +213,7 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 			$settings = ilViPLabSettings::getInstance();
 			
 			$settings->setActive($form->getInput('active'));
+			$settings->setLogLevel($form->getInput('log_level'));
 			$settings->setECSServer($form->getInput('ecs'));
 			$settings->setWidth($form->getInput('width'));
 			$settings->setHeight($form->getInput('height'));

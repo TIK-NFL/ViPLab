@@ -20,3 +20,4 @@ editor#:#Question Editor
 editor_start#:#Start Editor
 store_results#:#Save Solution Output
 store_results_info#:#If enabled, the output of the solution calculation will be stored.
+form_tab_settings_loglevel#:#Log-Level

@@ -193,7 +193,7 @@ class assViPLab extends assQuestion
 	*/
 	function saveToDb($original_id = "")
 	{
-		global $ilDB, $ilLog;
+		global $ilDB;
 
 		$this->saveQuestionDataToDb($original_id);
 
@@ -277,8 +277,6 @@ class assViPLab extends assQuestion
 				$this->setVipExerciseId((int) $data['vip_exercise_id']);
 				$this->setVipEvaluation((string) $data['vip_evaluation']);
 				$this->setVipResultStorage((int) $data['vip_result_storage']);
-				
-				#$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($data,TRUE));
 			}
 		}
 		parent::loadFromDb($question_id);
@@ -469,8 +467,7 @@ class assViPLab extends assQuestion
 	{
 		global $ilDB;
 		
-		
-		$GLOBALS['ilLog']->write(__METHOD__.': +++++++++++++ save working data');
+		ilLoggerFactory::getLogger('viplab')->debug('++++ save working data');
 
 		if(is_null($pass))
 		{
@@ -494,7 +491,7 @@ class assViPLab extends assQuestion
 		
 		$solution = ilUtil::stripSlashes($_POST['vipsolution']);
 		
-		$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($_POST,TRUE));
+		ilLoggerFactory::getLogger('viplab')->debug('post was: ' . print_r($_POST,true));
 
 		$next_id = $ilDB->nextId('tst_solutions');
 		$ilDB->insert(
@@ -696,7 +693,7 @@ class assViPLab extends assQuestion
 		
 		if($exc_id)
 		{
-			$GLOBALS['ilLog']->write('Deleting exercise');
+			ilLoggerFactory::getLogger('viplab')->debug('Deleting exercise');
 			try
 			{
 				$connector = new ilECSExerciseConnector(
@@ -712,7 +709,7 @@ class assViPLab extends assQuestion
 			}
 			catch(ilECSConnectorException $e)
 			{
-				$GLOBALS['ilLog']->write(__METHOD__.': Failed with message: '. $e->getMessage());
+				ilLoggerFactory::getLogger('viplab')->error('Deleting exercise failed with message: '. $e->getMessage());
 			}
 		}
 	}
@@ -726,7 +723,7 @@ class assViPLab extends assQuestion
 		
 		if($sub_id)
 		{
-			$GLOBALS['ilLog']->write('Deleting subparticipant');
+			ilLoggerFactory::getLogger('viplab')->debug('Deleting subparticipant');
 			try
 			{
 				$connector = new ilECSSubParticipantConnector(
@@ -742,10 +739,9 @@ class assViPLab extends assQuestion
 			}
 			catch(ilECSConnectorException $e)
 			{
-				$GLOBALS['ilLog']->write(__METHOD__.': Failed with message: '. $e->getMessage());
+				ilLoggerFactory::getLogger('viplab')->error('Deleting subparticipant failed with message: ' . $e->getMessage());
 			}
 		}
 	}
 }
-
 ?>

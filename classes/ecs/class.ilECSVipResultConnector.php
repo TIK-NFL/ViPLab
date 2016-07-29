@@ -29,9 +29,7 @@ class ilECSVipResultConnector extends ilECSConnector
 	 */
 	public function addResult($result, $a_receiver_com)
 	{
-		global $ilLog;
-		
-		$ilLog->write(__METHOD__.': Add new result resource for subparticipant: '.$a_receiver_com);
+		ilLoggerFactory::getLogger('viplab')->debug('Add new result resource for subparticipant: '.$a_receiver_com);
 
 	 	$this->path_postfix = self::RESOURCE_PATH;
 	 	
@@ -58,15 +56,15 @@ class ilECSVipResultConnector extends ilECSConnector
 			$ret = $this->call();
 			$info = $this->curl->getInfo(CURLINFO_HTTP_CODE);
 	
-			$ilLog->write(__METHOD__.': Checking HTTP status...');
+			ilLoggerFactory::getLogger('viplab')->debug('Checking HTTP status...');
 			if($info != self::HTTP_CODE_CREATED)
 			{
-				$ilLog->write(__METHOD__.': Cannot create result, did not receive HTTP 201. ');
-				$ilLog->write(__METHOD__.': '.print_r($ret,TRUE));
+				ilLoggerFactory::getLogger('viplab')->error('Cannot create result, did not receive HTTP 201. ');
+				ilLoggerFactory::getLogger('viplab')->error(print_r($ret,true));
 				
 				throw new ilECSConnectorException('Received HTTP status code: '.$info);
 			}
-			$ilLog->write(__METHOD__.': ... got HTTP 201 (created)');			
+			ilLoggerFactory::getLogger('viplab')->debug('...got HTTP 201 (created)');
 
 			$eid =  self::_fetchEContentIdFromHeader($this->curl->getResponseHeaderArray());
 			return $eid;
@@ -80,11 +78,11 @@ class ilECSVipResultConnector extends ilECSConnector
 	
 	/**
 	 * Delete sub participant
-	 * @param type $a_sub_id
+	 * @param type $a_exc_id
 	 */
 	public function deleteResult($a_exc_id)
 	{
-		$GLOBALS['ilLog']->write(__METHOD__.': Delete result with id '. $a_exc_id);
+		ilLoggerFactory::getLogger('viplab')->debug('Delete result with id: ' . $a_exc_id);
 	 	$this->path_postfix = self::RESOURCE_PATH;
 	 	
 	 	if($a_exc_id)

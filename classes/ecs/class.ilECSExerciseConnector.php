@@ -29,9 +29,7 @@ class ilECSExerciseConnector extends ilECSConnector
 	 */
 	public function addExercise($exercise, $a_receiver_com)
 	{
-		global $ilLog;
-		
-		$ilLog->write(__METHOD__.': Add new exercise resource for subparticipant: '.$a_receiver_com);
+		ilLoggerFactory::getLogger('viplab')->debug('Add new exercise ressource for subparticipant: '. $a_receiver_com);
 
 	 	$this->path_postfix = self::RESOURCE_PATH;
 	 	
@@ -57,16 +55,15 @@ class ilECSExerciseConnector extends ilECSConnector
 			}
 			$ret = $this->call();
 			$info = $this->curl->getInfo(CURLINFO_HTTP_CODE);
-	
-			$ilLog->write(__METHOD__.': Checking HTTP status...');
+
+			ilLoggerFactory::getLogger('viplab')->debug('Checking HTTP status...');
 			if($info != self::HTTP_CODE_CREATED)
 			{
-				$ilLog->write(__METHOD__.': Cannot create exercise, did not receive HTTP 201. ');
-				$ilLog->write(__METHOD__.': '.print_r($ret,TRUE));
-				
+				ilLoggerFactory::getLogger('viplab')->error('Cannot create exercise ressource, did not receive HTTP 201');
+				ilLoggerFactory::getLogger('viplab')->error('Return value: '. print_r($ret,true));
 				throw new ilECSConnectorException('Received HTTP status code: '.$info);
 			}
-			$ilLog->write(__METHOD__.': ... got HTTP 201 (created)');			
+			ilLoggerFactory::getLogger('viplab')->debug('... got HTTP 201 (created)');
 
 			$eid =  self::_fetchEContentIdFromHeader($this->curl->getResponseHeaderArray());
 			

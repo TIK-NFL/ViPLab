@@ -98,8 +98,7 @@ class ilECSSubParticipant
 			
 			$counter = 0;
 			
-			$GLOBALS['ilLog']->write(__METHOD__.': '.$this->getJson()->auth_ids);
-			
+			ilLoggerFactory::getLogger('viplab')->debug('Auth ids: ' . $this->getJson()->auth_ids);
 			foreach((array) $this->getJson()->auth_ids as $auth_id)
 			{
 				$this->auth_ids[$counter]['desc'] = (string) $auth_id->desc;
@@ -117,7 +116,7 @@ class ilECSSubParticipant
 				{
 					if($participant->itsyou == TRUE)
 					{
-						$GLOBALS['ilLog']->write(__METHOD__.': Found mid '.$participant->mid);
+						ilLoggerFactory::getLogger('viplab')->debug('Found mid : ' . $participant->mid);
 						$this->mid = $participant->mid;
 					}
 				}
