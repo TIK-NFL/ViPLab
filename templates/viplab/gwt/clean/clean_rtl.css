@@ -12,36 +12,6 @@
  *    }
  */
 
-body, table td, select, button {
-  font-family: Arial Unicode MS, Arial, sans-serif;
-  font-size: small;
-}
-pre {
-  font-family: "courier new", courier;
-  font-size: small;
-}
-body {
-  color: black;
-  margin: 10px;
-  border: 0px;
-  padding: 0px;
-  background: #fff;
-  direction: rtl;
-}
-a, a:visited {
-  color: #0066cc;
-  text-decoration:none;
-}
-
-a:hover {
-  color: #0066cc;
-  text-decoration:underline;
-}
-
-select {
-  background: white;
-}
-
 /**
  * The reference theme can be used to determine when this style sheet has
  * loaded.  Create a hidden div element with absolute position, assign the style
