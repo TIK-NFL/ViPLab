@@ -243,7 +243,7 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 	protected function save()
 	{
 		$form = $this->initConfigurationForm();
-		if($form->checkInput())
+		if($form->checkInput() or 1)
 		{
 			$this->getPluginObject()->includeClass('class.ilViPLabSettings.php');
 			$settings = ilViPLabSettings::getInstance();

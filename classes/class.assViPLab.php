@@ -574,20 +574,19 @@ class assViPLab extends assQuestion
 		return TRUE;
 	}
 	
-	/**
-	 * Reworks the allready saved working data if neccessary
-	 *
-	 * @abstract
-	 * @access protected
-	 * @param integer $active_id
-	 * @param integer $pass
-	 * @param boolean $obligationsAnswered
-	 */
-	protected function reworkWorkingData($active_id, $pass, $obligationsAnswered)
-	{
-		// nothing to rework!
-	}
 
+	/**
+	 * 
+	 * @param type $active_id
+	 * @param type $pass
+	 * @param type $obligationsAnswered
+	 * @param type $authorized
+	 */
+	public function reworkWorkingData($active_id, $pass, $obligationsAnswered, $authorized)
+	{
+		;
+	}
+	
 	/**
 	 * Returns the question type of the question
 	 *
@@ -648,20 +647,15 @@ class assViPLab extends assQuestion
 	}
 
 	/**
-	* Creates an Excel worksheet for the detailed cumulated results of this question
-	*
-	* @param object $worksheet Reference to the parent excel worksheet
-	* @param object $startrow Startrow of the output in the excel worksheet
-	* @param object $active_id Active id of the participant
-	* @param object $pass Test pass
-	* @param object $format_title Excel title format
-	* @param object $format_bold Excel bold format
-	* @param array $eval_data Cumulated evaluation data
-	* @access public
-	*/
-	public function setExportDetailsXLS(&$worksheet, $startrow, $active_id, $pass, &$format_title, &$format_bold)
+	 * required method stub
+	 * @param type $worksheet
+	 * @param type $startrow
+	 * @param type $active_id
+	 * @param type $pass
+	 */
+	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass)
 	{
-		return $startrow;
+		parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
 	}
 	
 	/**

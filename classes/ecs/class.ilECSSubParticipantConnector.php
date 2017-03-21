@@ -121,7 +121,8 @@ class ilECSSubParticipantConnector extends ilECSConnector
 		$headers = $ecs_result->getHeaders();
 		$location  = $headers['Location'];
 		
-		$id = end(split('/',$location));
+		$id = end(explode('/',$location));
+		
 		
 		$sub = new ilECSSubParticipant($ecs_result->getResult());
 		$sub->setId($id);
