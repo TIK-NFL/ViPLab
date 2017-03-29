@@ -553,11 +553,12 @@ class assViPLabGUI extends assQuestionGUI
 	}
 	
 	/**
-	 * Assuming form was validated before
+	 * Write post 
+	 * @param type $always
+	 * @return int
 	 */
-	public function writePostData()
+	public function writePostData($always = false)
 	{
-		// do nothing here and return 0 (ok)
 		return 0;
 	}
 
