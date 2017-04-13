@@ -1029,10 +1029,9 @@ class assViPLab extends assQuestion
 	{
 		global $ilDB;
 		
-		return  array(
-			'authorized' => true,
-			'intermediate' => true
-		);
+		$state = parent::lookupForExistingSolutions($activeId, $pass);
+		$state['intermediate'] = true;
+		return $state;
 	}
 }
 ?>
