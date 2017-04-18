@@ -1019,7 +1019,18 @@ class assViPLab extends assQuestion
 		}		
 	}
 	
-	
-
+	/**
+	 * Lookup if an authorized or intermediate solution exists
+	 * @param 	int 		$activeId
+	 * @param 	int 		$pass
+	 * @return 	array		['authorized' => bool, 'intermediate' => bool]
+	 */
+	public function lookupForExistingSolutions($activeId, $pass)
+	{
+		global $ilDB;
+		$state = parent::lookupForExistingSolutions($activeId, $pass);
+		$state['intermediate'] = true;
+		return $state;
+	}
 }
 ?>
