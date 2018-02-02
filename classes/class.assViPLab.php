@@ -1028,6 +1028,7 @@ class assViPLab extends assQuestion
 	public function lookupForExistingSolutions($activeId, $pass)
 	{
 		global $ilDB;
+		
 		$state = parent::lookupForExistingSolutions($activeId, $pass);
 		$state['intermediate'] = true;
 		return $state;
