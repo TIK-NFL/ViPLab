@@ -316,10 +316,6 @@ class assViPLabGUI extends assQuestionGUI
 		#$this->addQuestionFormCommandButtons($form);
 		$form->addCommandButton("save", $this->lng->txt("save"));
 
-		include_once "./Services/YUI/classes/class.ilYuiUtil.php";
-		ilYuiUtil::initConnection();
-		ilYUIUtil::initDomEvent();
-
 		$settings = ilViPLabSettings::getInstance();
 		
 		$GLOBALS['tpl']->addJavaScript($this->getPlugin()->getDirectory().'/js/editor_init.js');
@@ -756,11 +752,7 @@ class assViPLabGUI extends assQuestionGUI
 			$solutionoutput = $this->getILIASPage($solutionoutput);
 		}
 
-		#$GLOBALS['tpl']->addJavaScript($this->getPlugin()->getDirectory().'/js/scoring_init.js');
-		
 		return $solutionoutput;
-		
-		
 	}
 
 	public function getSpecificFeedbackOutput($active_id, $pass)
