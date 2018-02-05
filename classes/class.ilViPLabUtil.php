@@ -6,21 +6,21 @@
  */
 class ilViPLabUtil
 {
-	protected static $languages = array('C','C_P','C++','C++_P','DuMux','DuMux_P','Java','Java_P','Matlab','Matlab_P','Octave','Octave_P');
-	
-	
+	protected static $languages = array ('C','C_P','C++','C++_P','DuMux','DuMux_P','Java','Java_P','Matlab','Matlab_P','Octave','Octave_P');
+
 	/**
 	 * Get available programming languages
+	 *
 	 * @return array
 	 */
 	public static function getAvailableLanguages()
 	{
 		return self::$languages;
 	}
-	
-	
+
 	/**
 	 * Get ecs community id by mid
+	 *
 	 * @param ilECSSetting $server
 	 * @param type $a_mid
 	 * @return int
@@ -39,27 +39,25 @@ class ilViPLabUtil
 			return 0;
 		}
 	}
-	
-	
+
 	public static function lookupSubParticipant($a_cookie)
 	{
-		
 	}
-	
+
 	public static function extractJsonFromCustomZip($a_zip_string)
 	{
-		ilLoggerFactory::getLogger('viplab')->debug('Trying to decode '. $a_zip_string);
+		ilLoggerFactory::getLogger('viplab')->debug('Trying to decode ' . $a_zip_string);
 		
 		// check if custom zip format
-		if(substr($a_zip_string, 0, 4) != 'ZIP:')
+		if (substr($a_zip_string, 0, 4) != 'ZIP:')
 		{
 			ilLoggerFactory::getLogger('viplab')->debug('No custom zip format given.');
 			return $a_zip_string;
 		}
 		
-		$zip_cleaned = substr($a_zip_string,4);
+		$zip_cleaned = substr($a_zip_string, 4);
 		ilLoggerFactory::getLogger('viplab')->dump($zip_cleaned, ilLogLevel::DEBUG);
-
+		
 		// base64 decode
 		$decoded = base64_decode($zip_cleaned);
 		
@@ -68,7 +66,7 @@ class ilViPLabUtil
 		file_put_contents($tmp_name, $decoded);
 		
 		$zip = new ZipArchive();
-		if($zip->open($tmp_name) === true)
+		if ($zip->open($tmp_name) === true)
 		{
 			ilLoggerFactory::getLogger('viplab')->debug('Successfully decoded zip');
 			$json = $zip->getFromName('json');
@@ -76,14 +74,12 @@ class ilViPLabUtil
 			
 			unlink($tmp_name);
 			return $json;
-			
 		}
 		else
 		{
 			ilLoggerFactory::getLogger('viplab')->warning('Failed opening zip archive');
 		}
 		return $a_solution;
-		
 	}
 }
 ?>

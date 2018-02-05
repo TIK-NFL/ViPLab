@@ -100,21 +100,33 @@ class assViPLab extends assQuestion
 		return $this->vip_cookie;
 	}
 	
+	/**
+	 * @unused
+	 */
 	public function setVipWidth($a_width)
 	{
 		$this->vip_width = $a_width;
 	}
 	
+	/**
+	 * @unused
+	 */
 	public function getVipWidth()
 	{
 		return $this->vip_width;
 	}
 	
+	/**
+	 * @unused
+	 */
 	public function setVipHeight($a_height)
 	{
 		$this->vip_height = $a_height;
 	}
 	
+	/**
+	 * @unused
+	 */
 	public function getVipHeight()
 	{
 		return $this->vip_height;

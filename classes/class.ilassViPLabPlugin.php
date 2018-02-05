@@ -20,7 +20,7 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 	/**
 	 * Get singelton instance
 	 * @global ilPluginAdmin $ilPluginAdmin
-	 * @return ilViteroPlugin
+	 * @return ilassViPLabPlugin
 	 */
 	public static function getInstance()
 	{

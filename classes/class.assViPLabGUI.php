@@ -15,11 +15,9 @@ include_once './Modules/TestQuestionPool/classes/class.assQuestionGUI.php';
  */
 class assViPLabGUI extends assQuestionGUI
 {
-	private $vplugin;
-	
 	/**
 	 * Constructor
-	 * @param type $a_id
+	 * @param integer $a_id The database id of a question object
 	 */
 	public function __construct($a_id = -1)
 	{
@@ -31,7 +29,6 @@ class assViPLabGUI extends assQuestionGUI
 		{
 			$this->object->loadFromDb($a_id);
 		}
-		$this->vplugin = ilassViPLabPlugin::getInstance();
 	}
 	
 	/**
@@ -131,7 +128,7 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	protected function getPlugin()
 	{
-		return $this->vplugin;
+		return ilassViPLabPlugin::getInstance();
 	}
 	
 	/**
@@ -627,7 +624,7 @@ class assViPLabGUI extends assQuestionGUI
 
 		ilLoggerFactory::getLogger('viplab')->debug('VipCookie: '. $this->getViPLabQuestion()->getVipCookie());
 		
-		$atpl = ilassViPLabPlugin::getInstance()->getTemplate('tpl.applet_question.html');
+		$atpl = $this->getPlugin()->getTemplate('tpl.applet_question.html');
 
 		// What happens if has no solution, answers questions => and clicks "Calculate"?
 		$sol_id = $this->createSolution($active_id, $pass, false);
@@ -670,16 +667,16 @@ class assViPLabGUI extends assQuestionGUI
 
 	/**
 	 * Show solution output
-	 * @param type $active_id
-	 * @param type $pass
-	 * @param type $graphicalOutput
-	 * @param type $result_output
-	 * @param type $show_question_only
-	 * @param type $show_feedback
-	 * @param type $show_correct_solution
-	 * @param type $show_manual_scoring
-	 * @param type $show_question_text
-	 * @return string
+	 * @param integer $active_id             The active user id
+	 * @param integer $pass                  The test pass
+	 * @param boolean $graphicalOutput       Show visual feedback for right/wrong answers
+	 * @param boolean $result_output         Show the reached points for parts of the question
+	 * @param boolean $show_question_only    Show the question without the ILIAS content around
+	 * @param boolean $show_feedback         Show the question feedback
+	 * @param boolean $show_correct_solution Show the correct solution instead of the user solution
+	 * @param boolean $show_manual_scoring   Show specific information for the manual scoring output
+	 * @param boolean $show_question_text
+	 * @return string The solution output of the question as HTML code
 	 */
 	public function getSolutionOutput($active_id, $pass = NULL, $graphicalOutput = FALSE, $result_output = FALSE, $show_question_only = TRUE, $show_feedback = FALSE, $show_correct_solution = FALSE, $show_manual_scoring = FALSE, $show_question_text = TRUE)
 	{
