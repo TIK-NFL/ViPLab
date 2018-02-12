@@ -731,7 +731,7 @@ class assViPLab extends assQuestion
 			try
 			{
 				$connector = new ilECSExerciseConnector(
-					ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+					ilViPLabSettings::getInstance()->getECSServer()
 				);
 				$connector->deleteExercise($exc_id);
 				
@@ -761,7 +761,7 @@ class assViPLab extends assQuestion
 			try
 			{
 				$connector = new ilECSSubParticipantConnector(
-					ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+					ilViPLabSettings::getInstance()->getECSServer()
 				);
 				$connector->deleteSubParticipant($sub_id);
 				
@@ -795,7 +795,7 @@ class assViPLab extends assQuestion
 		try 
 		{
 			$scon = new ilECSEvaluationConnector(
-				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+				ilViPLabSettings::getInstance()->getECSServer()
 			);
 			
 			if($a_computational_backend)
@@ -838,7 +838,7 @@ class assViPLab extends assQuestion
 		try 
 		{
 			$scon = new ilECSVipResultConnector(
-				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+				ilViPLabSettings::getInstance()->getECSServer()
 			);
 			
 			$new_id = $scon->addResult($result_string,
@@ -872,7 +872,7 @@ class assViPLab extends assQuestion
 		try
 		{
 			$econ = new ilECSExerciseConnector(
-						ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+						ilViPLabSettings::getInstance()->getECSServer()
 			);
 			
 			if($a_computational_backend)
@@ -906,7 +906,7 @@ class assViPLab extends assQuestion
 			ilLoggerFactory::getLogger('viplab')->info($a_solution);
 			
 			$scon = new ilECSSolutionConnector(
-				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+				ilViPLabSettings::getInstance()->getECSServer()
 			);
 			
 			if($a_computational_backend)
@@ -972,7 +972,7 @@ class assViPLab extends assQuestion
 		try
 		{
 			$scon = new ilECSEvaluationJobConnector(
-				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+				ilViPLabSettings::getInstance()->getECSServer()
 			);
 			$new_id = $scon->addEvaluationJob(
 				$job,
@@ -995,7 +995,7 @@ class assViPLab extends assQuestion
 		{
 			$sub = new ilECSSubParticipant();
 			$com = ilViPLabUtil::lookupCommunityByMid(
-				ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer()),
+				ilViPLabSettings::getInstance()->getECSServer(),
 				ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang())
 			);
 			if($com instanceof ilECSCommunity)
@@ -1012,7 +1012,7 @@ class assViPLab extends assQuestion
 			try 
 			{
 				$connector = new ilECSSubParticipantConnector(
-					ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+					ilViPLabSettings::getInstance()->getECSServer()
 				);
 				$res = $connector->addSubParticipant($sub);
 			}

@@ -64,7 +64,7 @@ class ilECSViPLabRessources
 				try 
 				{
 					$connector = new ilECSSubParticipantConnector(
-						ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+						ilViPLabSettings::getInstance()->getECSServer()
 					);
 					$connector->deleteSubParticipant($ressource->getRessourceId());
 				} 
@@ -79,7 +79,7 @@ class ilECSViPLabRessources
 				try 
 				{
 					$connector = new ilECSExerciseConnector(
-						ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+						ilViPLabSettings::getInstance()->getECSServer()
 					);
 					$connector->deleteExercise($ressource->getRessourceId());
 				} 
@@ -94,7 +94,7 @@ class ilECSViPLabRessources
 				try 
 				{
 					$connector = new ilECSEvaluationConnector(
-						ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+						ilViPLabSettings::getInstance()->getECSServer()
 					);
 					$connector->deleteEvaluation($ressource->getRessourceId());
 				} 
@@ -109,7 +109,7 @@ class ilECSViPLabRessources
 				try 
 				{
 					$connector = new ilECSSolutionConnector(
-						ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer())
+						ilViPLabSettings::getInstance()->getECSServer()
 					);
 					$connector->deleteSolution($ressource->getRessourceId());
 				} 

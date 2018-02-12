@@ -22,10 +22,10 @@ class ilViPLabUtil
 	 * Get ecs community id by mid
 	 *
 	 * @param ilECSSetting $server
-	 * @param type $a_mid
+	 * @param int $a_mid
 	 * @return int
 	 */
-	public static function lookupCommunityByMid(ilECSSetting $server, $a_mid)
+	public static function lookupCommunityByMid(ilECSSetting $server, int $a_mid)
 	{
 		try
 		{

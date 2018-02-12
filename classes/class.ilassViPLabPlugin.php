@@ -58,7 +58,7 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 			return false;
 			/*
 			try {
-				$connector = new ilECSVipResultConnector(ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer()));
+				$connector = new ilECSVipResultConnector(ilViPLabSettings::getInstance()->getECSServer());
 				$result = $connector->getResult($a_event['event']['id']);
 
 				if($result instanceof ilECSResult)
@@ -76,7 +76,7 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 		
 		try {
 		
-			$connector = new ilECSPointsConnector(ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer()));
+			$connector = new ilECSPointsConnector(ilViPLabSettings::getInstance()->getECSServer());
 			$result = $connector->getPoints($a_event['event']['id']);
 			if($result instanceof ilECSResult)
 			{
