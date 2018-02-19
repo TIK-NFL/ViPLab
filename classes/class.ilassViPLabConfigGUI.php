@@ -90,23 +90,6 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		$ecs_select->setOptions($options);
 		$form->addItem($ecs_select);
 		
-		$editor = new ilNonEditableValueGUI($this->getPluginObject()->txt('form_tab_settings_editor'));
-		
-		$width = new ilNumberInputGUI($this->getPluginObject()->txt('form_tab_settings_editor_width'), 'width');
-		$width->setValue($settings->getWidth());
-		$width->setMinValue(1);
-		$width->setSize(4);
-		$width->setRequired(TRUE);
-		$editor->addSubItem($width);
-		
-		$height = new ilNumberInputGUI($this->getPluginObject()->txt('form_tab_settings_editor_height'), 'height');
-		$height->setValue($settings->getHeight());
-		$height->setMinValue(1);
-		$height->setSize(4);
-		$height->setRequired(TRUE);
-		$editor->addSubItem($height);
-		$form->addItem($editor);
-		
 		// evaluation backend
 		$evaluation_backend = new ilSelectInputGUI($this->getPluginObject()->txt('form_tab_settings_eval_backend'), 'evaluation_mid');
 		$evaluation_options = array();
@@ -242,8 +225,6 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 			$settings->setActive($form->getInput('active'));
 			$settings->setLogLevel($form->getInput('log_level'));
 			$settings->setECSServerId((int) $form->getInput('ecs'));
-			$settings->setWidth($form->getInput('width'));
-			$settings->setHeight($form->getInput('height'));
 			$settings->setEvaluationMid($form->getInput('evaluation_mid'));
 			$settings->setEvaluationReceiverMid($form->getInput('evaluation_own_mid'));
 			

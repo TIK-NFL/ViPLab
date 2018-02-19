@@ -325,10 +325,6 @@ class assViPLabGUI extends assQuestionGUI
 		{
 			$eva_id = $this->createEvaluation();
 			
-			$applet->setVariable('VIP_APPLET_URL',$this->getPlugin()->getDirectory().'/templates/applet/TeacherApplet.jar');
-			$applet->setVariable('VIP_WIDTH',$settings->getWidth());
-			$applet->setVariable('VIP_HEIGHT',$settings->getHeight());
-			$applet->setVariable('VIP_APPLET',$this->getPlugin()->getDirectory().'/templates/applet/TeacherApplet.jar');
 			$applet->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
 			$applet->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 			$applet->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
@@ -627,10 +623,6 @@ class assViPLabGUI extends assQuestionGUI
 
 		
 		$atpl->setVariable('QUESTIONTEXT', $this->getViPLabQuestion()->prepareTextareaOutput($this->getViPLabQuestion()->getQuestion(), TRUE));
-		$atpl->setVariable('VIP_APPLET_URL',$this->getPlugin()->getDirectory().'/templates/applet/StudentApplet.jar');
-		$atpl->setVariable('VIP_WIDTH',$settings->getWidth());
-		$atpl->setVariable('VIP_HEIGHT',$settings->getHeight());
-		$atpl->setVariable('VIP_APPLET',$this->getPlugin()->getDirectory().'/templates/applet/StudentApplet.jar');
 		$atpl->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
 		$atpl->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 		$atpl->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
@@ -712,11 +704,7 @@ class assViPLabGUI extends assQuestionGUI
 			
 			$soltpl->setCurrentBlock('complete');
 			$soltpl->setVariable('VIP_APP_ID',$this->getViPLabQuestion()->getId());
-			$soltpl->setVariable('VIP_APPLET_URL',$this->getPlugin()->getDirectory().'/templates/applet/TeacherApplet.jar');
 			$soltpl->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
-			$soltpl->setVariable('VIP_WIDTH',$settings->getWidth());
-			$soltpl->setVariable('VIP_HEIGHT',$settings->getHeight());
-			$soltpl->setVariable('VIP_APPLET',$this->getPlugin()->getDirectory().'/templates/applet/TeacherApplet.jar');
 			$soltpl->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
 			$soltpl->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 			$soltpl->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));

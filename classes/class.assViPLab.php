@@ -34,10 +34,17 @@ class assViPLab extends assQuestion
 {
 	const ADDITIONAL_TBL_NAME = 'il_qpl_qst_viplab';
 	
+	/**
+	 * 
+	 * @var integer
+	 */
 	private $vip_sub_id = 0;
 	private $vip_cookie = '';
-	private $vip_width = 0;
-	private $vip_height = 0;
+	
+	/**
+	 * 
+	 * @var string
+	 */
 	private $vip_lang = '';
 	private $vip_exercise = '';
 	private $vip_evaluation = '';
@@ -101,37 +108,9 @@ class assViPLab extends assQuestion
 	}
 	
 	/**
-	 * @unused
+	 * 
+	 * @param string $a_lang
 	 */
-	public function setVipWidth($a_width)
-	{
-		$this->vip_width = $a_width;
-	}
-	
-	/**
-	 * @unused
-	 */
-	public function getVipWidth()
-	{
-		return $this->vip_width;
-	}
-	
-	/**
-	 * @unused
-	 */
-	public function setVipHeight($a_height)
-	{
-		$this->vip_height = $a_height;
-	}
-	
-	/**
-	 * @unused
-	 */
-	public function getVipHeight()
-	{
-		return $this->vip_height;
-	}
-	
 	public function setVipLang($a_lang)
 	{
 		$this->vip_lang = $a_lang;
@@ -139,8 +118,8 @@ class assViPLab extends assQuestion
 	
 	/**
 	 * Get vip lang
-	 * @param type $a_shortened
-	 * @return type
+	 * @param bool $a_shortened
+	 * @return string
 	 */
 	public function getVipLang($a_shortened = false)
 	{
@@ -242,8 +221,6 @@ class assViPLab extends assQuestion
 					'question_fi'	=> array('integer',(int) $this->getId()),
 					'vip_sub_id'	=> array('integer',(int) $this->getVipSubId()),
 					'vip_cookie'	=> array('text',(string) $this->getVipCookie()),
-					'vip_width'		=> array('integer',(int) $this->getVipWidth()),
-					'vip_height'	=> array('integer',(int) $this->getVipHeight()),
 					'vip_exercise'	=> array('clob',(string) $this->getVipExercise()),
 					'vip_lang'		=> array('text', (string) $this->getVipLang()),
 					'vip_exercise_id'	=> array('integer',(string) $this->getVipExerciseId()),
@@ -304,8 +281,6 @@ class assViPLab extends assQuestion
 				
 				$this->setVipSubId((int) $data['vip_sub_id']);
 				$this->setVipCookie((string) $data['vip_cookie']);
-				$this->setVipWidth((int) $data['vip_width']);
-				$this->setVipHeight((int) $data['vip_height']);
 				$this->setVipExercise((string) $data['vip_exercise']);
 				$this->setVipLang((string) $data['vip_lang']);
 				$this->setVipExerciseId((int) $data['vip_exercise_id']);
@@ -660,10 +635,11 @@ class assViPLab extends assQuestion
 
 	/**
 	 * required method stub
-	 * @param type $worksheet
-	 * @param type $startrow
-	 * @param type $active_id
-	 * @param type $pass
+	 * 
+	 * @param object $worksheet    Reference to the parent excel worksheet
+	 * @param object $startrow     Startrow of the output in the excel worksheet
+	 * @param object $active_id    Active id of the participant
+	 * @param object $pass         Test pass
 	 */
 	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass)
 	{

@@ -25,8 +25,6 @@ class ilViPLabSettings
 	 * @var integer
 	 */
 	private $ecsServerId = 0;
-	private $width = 800;
-	private $height = 600;
 	/**
 	 * Get enabled languages as associative array where the key is the language and the value is the mid.
 	 *
@@ -112,26 +110,6 @@ class ilViPLabSettings
 		$this->ecsServerId = $a_server_id;
 	}
 
-	public function getWidth()
-	{
-		return $this->width;
-	}
-
-	public function setWidth($a_width)
-	{
-		$this->width = $a_width;
-	}
-
-	public function getHeight()
-	{
-		return $this->height;
-	}
-
-	public function setHeight($a_height)
-	{
-		$this->height = $a_height;
-	}
-
 	/**
 	 * Get enabled languages as associative array where the key is the language and the value is the mid.
 	 *
@@ -204,8 +182,6 @@ class ilViPLabSettings
 	{
 		$this->getStorage()->set('active', (int) $this->isActive());
 		$this->getStorage()->set('ecs', $this->getECSServerId());
-		$this->getStorage()->set('width', $this->getWidth());
-		$this->getStorage()->set('height', $this->getHeight());
 		
 		$ser_language = serialize($this->getLanguages());
 		$this->getStorage()->set('languages', $ser_language);
@@ -230,8 +206,6 @@ class ilViPLabSettings
 	{
 		$this->setActive($this->getStorage()->get('active', $this->active));
 		$this->setECSServerId($this->getStorage()->get('ecs', $this->ecsServerId));
-		$this->setWidth($this->getStorage()->get('width', $this->width));
-		$this->setHeight($this->getStorage()->get('height', $this->height));
 		$this->setLanguages(unserialize($this->getStorage()->get('languages', serialize($this->languages))));
 		$this->setLogLevel($this->getStorage()->get('log_level', $this->log_level));
 		$this->setEvaluationMid($this->getStorage()->get('evaluation_mid'), $this->evaluation_mid);

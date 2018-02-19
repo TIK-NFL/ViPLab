@@ -202,3 +202,19 @@ if(!$ilDB->tableColumnExists('il_qpl_qst_viplab','vip_auto_scoring'))
 		);
 }
 ?>
+<#11>
+<?php
+if($ilDB->tableColumnExists('il_qpl_qst_viplab', 'vip_width'))
+{
+	$ilDB->dropTableColumn('il_qpl_qst_viplab', 'vip_width');
+}
+
+if($ilDB->tableColumnExists('il_qpl_qst_viplab', 'vip_height'))
+{
+	$ilDB->dropTableColumn('il_qpl_qst_viplab', 'vip_height');
+}
+
+$vipSettings = new ilSetting('ass_viplab');
+$vipSettings->delete('width');
+$vipSettings->delete('height');
+?>
