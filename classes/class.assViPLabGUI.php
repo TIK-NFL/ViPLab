@@ -353,6 +353,7 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	protected function initEditor()
 	{
+		global $DIC;
 		ilECSViPLabRessources::deleteDeprecated();
 		
 		
@@ -361,13 +362,13 @@ class assViPLabGUI extends assQuestionGUI
 		if(!$form->checkInput())
 		{
 			$form->setValuesByPost();
-			ilUtil::sendFailure($GLOBALS['lng']->txt('err_check_input'),TRUE);
+			ilUtil::sendFailure($DIC->language()->txt('err_check_input'), TRUE);
 			$this->editQuestion($form);
 			return TRUE;
 		}
 
 		// form valid
-		$this->writePostFromForm($form);
+		$this->writeVipLabQuestionFromForm($form);
 		
 		$this->getViPLabQuestion()->deleteSubParticipant();
 		$this->addSubParticipant();
@@ -476,7 +477,7 @@ class assViPLabGUI extends assQuestionGUI
 		$form = $this->initQuestionForm();
 		if($form->checkInput())
 		{
-			$this->writePostFromForm($form);
+			$this->writeVipLabQuestionFromForm();
 			parent::save();
 		}
 		else
@@ -498,7 +499,7 @@ class assViPLabGUI extends assQuestionGUI
 		$form = $this->initQuestionForm();
 		if($form->checkInput())
 		{
-			$this->writePostFromForm($form);
+			$this->writeVipLabQuestionFromForm($form);
 			parent::saveReturn();
 		}
 		else
@@ -510,34 +511,33 @@ class assViPLabGUI extends assQuestionGUI
 	}
 	
 	/**
-	 * Write post from form
+	 * Set the VipLab Question attributes to the Input of the form.
 	 */
-	public function writePostFromForm(ilPropertyFormGUI $form)
+	public function writeVipLabQuestionFromForm(ilPropertyFormGUI $form)
 	{
-		$this->getViPLabQuestion()->setTitle($form->getInput('title'));
-		$this->getViPLabQuestion()->setComment($form->getInput('comment'));
-		$this->getViPLabQuestion()->setAuthor($form->getInput('author'));
-		$this->getViPLabQuestion()->setQuestion($form->getInput('question'));
-		$this->getViPLabQuestion()->setPoints($form->getInput('points'));
-		$this->getViPLabQuestion()->setVipExercise($form->getInput('vipexercise'));
+		$vibLabQuestion = $this->getViPLabQuestion();
+		$vibLabQuestion->setTitle($form->getInput('title'));
+		$vibLabQuestion->setComment($form->getInput('comment'));
+		$vibLabQuestion->setAuthor($form->getInput('author'));
+		$vibLabQuestion->setQuestion($form->getInput('question'));
+		$vibLabQuestion->setPoints($form->getInput('points'));
+		$vibLabQuestion->setVipExercise($form->getInput('vipexercise'));
 		
 		$evaluation = ilViPLabUtil::extractJsonFromCustomZip($form->getInput('vipevaluation'));
-		$this->getViPLabQuestion()->setVipEvaluation($evaluation);
+		$vibLabQuestion->setVipEvaluation($evaluation);
 		
+		$vibLabQuestion->setVipResultStorage($form->getInput('result_storing'));
+		$vibLabQuestion->setVipAutoScoring($form->getInput('auto_scoring'));
 		
+		ilLoggerFactory::getLogger('viplab')->debug(print_r($form->getInput('vipexercise'), true));
 		
-		$this->getViPLabQuestion()->setVipResultStorage($form->getInput('result_storing'));
-		$this->getViPLabQuestion()->setVipAutoScoring($form->getInput('auto_scoring'));
-		
-		ilLoggerFactory::getLogger('viplab')->debug(print_r($form->getInput('vipexercise'),true));
-		
-		$this->getViPLabQuestion()->setEstimatedWorkingTime(
+		$vibLabQuestion->setEstimatedWorkingTime(
 			$_POST["Estimated"]["hh"],
 			$_POST["Estimated"]["mm"],
 			$_POST["Estimated"]["ss"]
 		);
 		
-		$this->getViPLabQuestion()->setVipLang($form->getInput('language'));
+		$vibLabQuestion->setVipLang($form->getInput('language'));
 		return TRUE;
 	}
 	
