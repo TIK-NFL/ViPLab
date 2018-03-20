@@ -315,40 +315,18 @@ class assViPLabGUI extends assQuestionGUI
 
 		#$this->addQuestionFormCommandButtons($form);
 		$form->addCommandButton("save", $this->lng->txt("save"));
-
-		$settings = ilViPLabSettings::getInstance();
 		
-		$GLOBALS['tpl']->addJavaScript($this->getPlugin()->getDirectory().'/js/editor_init.js');
-		$applet = $this->getPlugin()->getTemplate('tpl.applet_editor.html',TRUE,TRUE);
+		$editor_form = new ilViPLabEditorFormGUI($this->getPlugin()->txt('editor'), 'editor', $this->getViPLabQuestion());
+		$editor_form->showEditor($this->getViPLabQuestion()->getVipSubId() && $a_show_editor);
 		
-		if($this->getViPLabQuestion()->getVipSubId() && $a_show_editor)
-		{
-			$eva_id = $this->createEvaluation();
-			
-			$applet->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
-			$applet->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
-			$applet->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
-			$applet->setVariable('VIP_LANG',$this->getViPLabQuestion()->getVipLang(true));
-			$applet->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
-			$applet->setVariable('VIP_EVALUATION',$eva_id);
-			$applet->setVariable('INITJS',$this->getPlugin()->getDirectory().'/templates');
-		}
-		else
-		{
-			$applet->setCurrentBlock('incomplete');
-			$applet->setVariable('EDITOR_INIT',$this->getPlugin()->txt('editor_start'));
-			$applet->parseCurrentBlock();
-		}
-		
-		$applet_form = new ilCustomInputGUI($this->getPlugin()->txt('editor'),'editor');
-		$applet_form->setHtml($applet->get());
-		
-		$form->addItem($applet_form);
+		$form->addItem($editor_form);
 		return $form;
 	}
 
 	/**
 	 * Initialize applet editor
+	 * 
+	 * TODO: dependencies
 	 * @return type
 	 */
 	protected function initEditor()
