@@ -5,7 +5,7 @@ require_once ('./Services/Form/classes/class.ilSubEnabledFormPropertyGUI.php');
  *
  * @author Leon Kiefer <leon.kiefer@tik.uni-stuttgart.de>
  */
-class ilViPLabEditorFormGUI extends ilSubEnabledFormPropertyGUI
+class ilViPLabEditorFormGUI extends ilFormPropertyGUI
 {
 	/**
 	 *
@@ -32,11 +32,22 @@ class ilViPLabEditorFormGUI extends ilSubEnabledFormPropertyGUI
 	{
 		parent::__construct($a_title, $a_postvar);
 		$this->setType("custom");
+		$this->viPLabQuestion = $a_ViPLabQuestion;
 	}
 
 	public function showEditor($a_show_editor)
 	{
 		$this->show_editor = $a_show_editor;
+	}
+
+	/**
+	 * Set value by array
+	 *
+	 * @param array $a_values
+	 *        	value array
+	 */
+	function setValueByArray($a_values)
+	{
 	}
 
 	/**
@@ -65,7 +76,7 @@ class ilViPLabEditorFormGUI extends ilSubEnabledFormPropertyGUI
 		else
 		{
 			$applet->setCurrentBlock('incomplete');
-			$applet->setVariable('EDITOR_INIT', $this->getPlugin()->txt('editor_start'));
+			$applet->setVariable('EDITOR_INIT', $this->viPLabQuestion->getPlugin()->txt('editor_start'));
 			$applet->parseCurrentBlock();
 		}
 		return $applet->get();
