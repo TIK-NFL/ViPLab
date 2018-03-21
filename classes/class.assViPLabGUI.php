@@ -455,7 +455,7 @@ class assViPLabGUI extends assQuestionGUI
 		$form = $this->initQuestionForm();
 		if($form->checkInput())
 		{
-			$this->writeVipLabQuestionFromForm();
+			$this->writeVipLabQuestionFromForm($form);
 			parent::save();
 		}
 		else
