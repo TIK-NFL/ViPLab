@@ -41,8 +41,7 @@ class ilECSEvaluationJob
 	
 	public function setExercise($a_excercise)
 	{
-		include_once 'Services/WebServices/ECS/classes/class.ilECSSetting.php';
-		$ecs = ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer());
+		$ecs = ilViPLabSettings::getInstance()->getECSServer();
 
 		
 		$uri = $ecs->getServerURI();
@@ -55,8 +54,7 @@ class ilECSEvaluationJob
 	
 	public function setEvaluation($a_evaluation)
 	{
-		include_once 'Services/WebServices/ECS/classes/class.ilECSSetting.php';
-		$ecs = ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer());
+		$ecs = ilViPLabSettings::getInstance()->getECSServer();
 
 		
 		$uri = $ecs->getServerURI();
@@ -68,8 +66,7 @@ class ilECSEvaluationJob
 	
 	public function setSolution($a_solution)
 	{
-		include_once 'Services/WebServices/ECS/classes/class.ilECSSetting.php';
-		$ecs = ilECSSetting::getInstanceByServerId(ilViPLabSettings::getInstance()->getECSServer());
+		$ecs = ilViPLabSettings::getInstance()->getECSServer();
 
 		$uri = $ecs->getServerURI();
 		$uri .= ilECSSolutionConnector::RESOURCE_PATH;

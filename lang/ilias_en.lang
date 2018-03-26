@@ -4,9 +4,6 @@ form_tab_settings#:#Settings for the ViPLab-Question-Plugin
 form_tab_settings_activate#:#Activate Question-Plugin
 form_tab_settings_ecs_server#:#ECS-Server
 form_tab_settings_ecs_server_info#:#Please choose one ECS-Server, which is used for the synchronisation of questions
-form_tab_settings_editor#:#Editor Dimensions
-form_tab_settings_editor_width#:#Width
-form_tab_settings_editor_height#:#Height
 plang_C#:#C (Test System)
 plang_C++#:#C++ (Test System)
 plang_Java#:#Java (Test System)
@@ -18,7 +15,7 @@ plang_C++_P#:#C++ (Productive System)
 plang_Java_P#:#Java (Productive System)
 plang_DuMux_P#:#DuMux (Productive System)
 plang_Matlab_P#:#Matlab (Productive System)
-plang_Octave#_P:#Octave (Productive System)
+plang_Octave_P#:#Octave (Productive System)
 form_tab_settings_section_languages#:#Assignment of Programming Languages
 editor_lang#:#Programming Language
 ecs_mid#:#Mid

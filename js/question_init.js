@@ -1,4 +1,4 @@
-YAHOO.util.Event.onDOMReady(ilViPLabInitEditor,prefix = new String(""));
+$(ilViPLabInitEditor);
 
 function ilViPLabInitEditor()
 {

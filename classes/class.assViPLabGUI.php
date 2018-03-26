@@ -15,11 +15,9 @@ include_once './Modules/TestQuestionPool/classes/class.assQuestionGUI.php';
  */
 class assViPLabGUI extends assQuestionGUI
 {
-	private $vplugin;
-	
 	/**
 	 * Constructor
-	 * @param type $a_id
+	 * @param integer $a_id The database id of a question object
 	 */
 	public function __construct($a_id = -1)
 	{
@@ -31,7 +29,6 @@ class assViPLabGUI extends assQuestionGUI
 		{
 			$this->object->loadFromDb($a_id);
 		}
-		$this->vplugin = ilassViPLabPlugin::getInstance();
 	}
 	
 	/**
@@ -131,7 +128,7 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	protected function getPlugin()
 	{
-		return $this->vplugin;
+		return ilassViPLabPlugin::getInstance();
 	}
 	
 	/**
@@ -318,52 +315,23 @@ class assViPLabGUI extends assQuestionGUI
 
 		#$this->addQuestionFormCommandButtons($form);
 		$form->addCommandButton("save", $this->lng->txt("save"));
-
-		include_once "./Services/YUI/classes/class.ilYuiUtil.php";
-		ilYuiUtil::initConnection();
-		ilYUIUtil::initDomEvent();
-
-		$settings = ilViPLabSettings::getInstance();
 		
-		$GLOBALS['tpl']->addJavaScript($this->getPlugin()->getDirectory().'/js/editor_init.js');
-		$applet = $this->getPlugin()->getTemplate('tpl.applet_editor.html',TRUE,TRUE);
+		$editor_form = new ilViPLabEditorFormGUI($this->getPlugin()->txt('editor'), 'editor', $this->getViPLabQuestion());
+		$editor_form->showEditor($this->getViPLabQuestion()->getVipSubId() && $a_show_editor);
 		
-		if($this->getViPLabQuestion()->getVipSubId() && $a_show_editor)
-		{
-			$eva_id = $this->createEvaluation();
-			
-			$applet->setVariable('VIP_APPLET_URL',$this->getPlugin()->getDirectory().'/templates/applet/TeacherApplet.jar');
-			$applet->setVariable('VIP_WIDTH',$settings->getWidth());
-			$applet->setVariable('VIP_HEIGHT',$settings->getHeight());
-			$applet->setVariable('VIP_APPLET',$this->getPlugin()->getDirectory().'/templates/applet/TeacherApplet.jar');
-			$applet->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
-			$applet->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
-			$applet->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
-			$applet->setVariable('VIP_LANG',$this->getViPLabQuestion()->getVipLang(true));
-			$applet->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
-			$applet->setVariable('VIP_EVALUATION',$eva_id);
-			$applet->setVariable('INITJS',$this->getPlugin()->getDirectory().'/templates');
-		}
-		else
-		{
-			$applet->setCurrentBlock('incomplete');
-			$applet->setVariable('EDITOR_INIT',$this->getPlugin()->txt('editor_start'));
-			$applet->parseCurrentBlock();
-		}
-		
-		$applet_form = new ilCustomInputGUI($this->getPlugin()->txt('editor'),'editor');
-		$applet_form->setHtml($applet->get());
-		
-		$form->addItem($applet_form);
+		$form->addItem($editor_form);
 		return $form;
 	}
 
 	/**
 	 * Initialize applet editor
+	 * 
+	 * TODO: dependencies
 	 * @return type
 	 */
 	protected function initEditor()
 	{
+		global $DIC;
 		ilECSViPLabRessources::deleteDeprecated();
 		
 		
@@ -372,13 +340,13 @@ class assViPLabGUI extends assQuestionGUI
 		if(!$form->checkInput())
 		{
 			$form->setValuesByPost();
-			ilUtil::sendFailure($GLOBALS['lng']->txt('err_check_input'),TRUE);
+			ilUtil::sendFailure($DIC->language()->txt('err_check_input'), TRUE);
 			$this->editQuestion($form);
 			return TRUE;
 		}
 
 		// form valid
-		$this->writePostFromForm($form);
+		$this->writeVipLabQuestionFromForm($form);
 		
 		$this->getViPLabQuestion()->deleteSubParticipant();
 		$this->addSubParticipant();
@@ -487,7 +455,7 @@ class assViPLabGUI extends assQuestionGUI
 		$form = $this->initQuestionForm();
 		if($form->checkInput())
 		{
-			$this->writePostFromForm($form);
+			$this->writeVipLabQuestionFromForm($form);
 			parent::save();
 		}
 		else
@@ -509,7 +477,7 @@ class assViPLabGUI extends assQuestionGUI
 		$form = $this->initQuestionForm();
 		if($form->checkInput())
 		{
-			$this->writePostFromForm($form);
+			$this->writeVipLabQuestionFromForm($form);
 			parent::saveReturn();
 		}
 		else
@@ -521,34 +489,33 @@ class assViPLabGUI extends assQuestionGUI
 	}
 	
 	/**
-	 * Write post from form
+	 * Set the VipLab Question attributes to the Input of the form.
 	 */
-	public function writePostFromForm(ilPropertyFormGUI $form)
+	public function writeVipLabQuestionFromForm(ilPropertyFormGUI $form)
 	{
-		$this->getViPLabQuestion()->setTitle($form->getInput('title'));
-		$this->getViPLabQuestion()->setComment($form->getInput('comment'));
-		$this->getViPLabQuestion()->setAuthor($form->getInput('author'));
-		$this->getViPLabQuestion()->setQuestion($form->getInput('question'));
-		$this->getViPLabQuestion()->setPoints($form->getInput('points'));
-		$this->getViPLabQuestion()->setVipExercise($form->getInput('vipexercise'));
+		$vibLabQuestion = $this->getViPLabQuestion();
+		$vibLabQuestion->setTitle($form->getInput('title'));
+		$vibLabQuestion->setComment($form->getInput('comment'));
+		$vibLabQuestion->setAuthor($form->getInput('author'));
+		$vibLabQuestion->setQuestion($form->getInput('question'));
+		$vibLabQuestion->setPoints($form->getInput('points'));
+		$vibLabQuestion->setVipExercise($form->getInput('vipexercise'));
 		
 		$evaluation = ilViPLabUtil::extractJsonFromCustomZip($form->getInput('vipevaluation'));
-		$this->getViPLabQuestion()->setVipEvaluation($evaluation);
+		$vibLabQuestion->setVipEvaluation($evaluation);
 		
+		$vibLabQuestion->setVipResultStorage($form->getInput('result_storing'));
+		$vibLabQuestion->setVipAutoScoring($form->getInput('auto_scoring'));
 		
+		ilLoggerFactory::getLogger('viplab')->debug(print_r($form->getInput('vipexercise'), true));
 		
-		$this->getViPLabQuestion()->setVipResultStorage($form->getInput('result_storing'));
-		$this->getViPLabQuestion()->setVipAutoScoring($form->getInput('auto_scoring'));
-		
-		ilLoggerFactory::getLogger('viplab')->debug(print_r($form->getInput('vipexercise'),true));
-		
-		$this->getViPLabQuestion()->setEstimatedWorkingTime(
+		$vibLabQuestion->setEstimatedWorkingTime(
 			$_POST["Estimated"]["hh"],
 			$_POST["Estimated"]["mm"],
 			$_POST["Estimated"]["ss"]
 		);
 		
-		$this->getViPLabQuestion()->setVipLang($form->getInput('language'));
+		$vibLabQuestion->setVipLang($form->getInput('language'));
 		return TRUE;
 	}
 	
@@ -589,7 +556,7 @@ class assViPLabGUI extends assQuestionGUI
 		
 		$template->setVariable('VIP_ID', $this->getViPLabQuestion()->getId());
 		$template->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
-		$template->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
+		$template->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
 		$template->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 		$template->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
 		$template->setVariable('INITJS',$this->getPlugin()->getDirectory().'/templates');
@@ -627,18 +594,14 @@ class assViPLabGUI extends assQuestionGUI
 
 		ilLoggerFactory::getLogger('viplab')->debug('VipCookie: '. $this->getViPLabQuestion()->getVipCookie());
 		
-		$atpl = ilassViPLabPlugin::getInstance()->getTemplate('tpl.applet_question.html');
+		$atpl = $this->getPlugin()->getTemplate('tpl.applet_question.html');
 
 		// What happens if has no solution, answers questions => and clicks "Calculate"?
 		$sol_id = $this->createSolution($active_id, $pass, false);
 
 		
 		$atpl->setVariable('QUESTIONTEXT', $this->getViPLabQuestion()->prepareTextareaOutput($this->getViPLabQuestion()->getQuestion(), TRUE));
-		$atpl->setVariable('VIP_APPLET_URL',$this->getPlugin()->getDirectory().'/templates/applet/StudentApplet.jar');
-		$atpl->setVariable('VIP_WIDTH',$settings->getWidth());
-		$atpl->setVariable('VIP_HEIGHT',$settings->getHeight());
-		$atpl->setVariable('VIP_APPLET',$this->getPlugin()->getDirectory().'/templates/applet/StudentApplet.jar');
-		$atpl->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
+		$atpl->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
 		$atpl->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 		$atpl->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
 		$atpl->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
@@ -670,16 +633,16 @@ class assViPLabGUI extends assQuestionGUI
 
 	/**
 	 * Show solution output
-	 * @param type $active_id
-	 * @param type $pass
-	 * @param type $graphicalOutput
-	 * @param type $result_output
-	 * @param type $show_question_only
-	 * @param type $show_feedback
-	 * @param type $show_correct_solution
-	 * @param type $show_manual_scoring
-	 * @param type $show_question_text
-	 * @return string
+	 * @param integer $active_id             The active user id
+	 * @param integer $pass                  The test pass
+	 * @param boolean $graphicalOutput       Show visual feedback for right/wrong answers
+	 * @param boolean $result_output         Show the reached points for parts of the question
+	 * @param boolean $show_question_only    Show the question without the ILIAS content around
+	 * @param boolean $show_feedback         Show the question feedback
+	 * @param boolean $show_correct_solution Show the correct solution instead of the user solution
+	 * @param boolean $show_manual_scoring   Show specific information for the manual scoring output
+	 * @param boolean $show_question_text
+	 * @return string The solution output of the question as HTML code
 	 */
 	public function getSolutionOutput($active_id, $pass = NULL, $graphicalOutput = FALSE, $result_output = FALSE, $show_question_only = TRUE, $show_feedback = FALSE, $show_correct_solution = FALSE, $show_manual_scoring = FALSE, $show_question_text = TRUE)
 	{
@@ -719,12 +682,8 @@ class assViPLabGUI extends assQuestionGUI
 			
 			$soltpl->setCurrentBlock('complete');
 			$soltpl->setVariable('VIP_APP_ID',$this->getViPLabQuestion()->getId());
-			$soltpl->setVariable('VIP_APPLET_URL',$this->getPlugin()->getDirectory().'/templates/applet/TeacherApplet.jar');
-			$soltpl->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
-			$soltpl->setVariable('VIP_WIDTH',$settings->getWidth());
-			$soltpl->setVariable('VIP_HEIGHT',$settings->getHeight());
-			$soltpl->setVariable('VIP_APPLET',$this->getPlugin()->getDirectory().'/templates/applet/TeacherApplet.jar');
-			$soltpl->setVariable('VIP_ECS_URL', ilECSSetting::getInstanceByServerId($settings->getECSServer())->getServerURI());
+			$soltpl->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
+			$soltpl->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
 			$soltpl->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 			$soltpl->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
 			$soltpl->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
@@ -759,11 +718,7 @@ class assViPLabGUI extends assQuestionGUI
 			$solutionoutput = $this->getILIASPage($solutionoutput);
 		}
 
-		#$GLOBALS['tpl']->addJavaScript($this->getPlugin()->getDirectory().'/js/scoring_init.js');
-		
 		return $solutionoutput;
-		
-		
 	}
 
 	public function getSpecificFeedbackOutput($active_id, $pass)

@@ -4,9 +4,6 @@ form_tab_settings#:#Einstellungen zum ViPLab-Fragen Plugin
 form_tab_settings_activate#:#Fragen-Plugin aktivieren
 form_tab_settings_ecs_server#:#ECS-Server
 form_tab_settings_ecs_server_info#:#Bitte wählen sie einen ECS-Server aus, der für die Synchronisation der Fragen und Antworten genutzt werden soll.
-form_tab_settings_editor#:#Editor-Maße
-form_tab_settings_editor_width#:#Breite
-form_tab_settings_editor_height#:#Höhe
 plang_C#:#C (Testsystem)
 plang_C++#:#C++ (Testsystem)
 plang_Java#:#Java (Testsystem)
