@@ -38,7 +38,8 @@ class ilECSPointsConnector extends ilECSConnector
 			$this->prepareConnection();
 			$this->addHeader('Content-Type', 'application/json');
 			$this->addHeader('Accept', 'application/json');
-
+			$this->curl->setOpt(CURLOPT_CUSTOMREQUEST, 'DELETE');
+			
 			$res = $this->call();
 
 			// Checking status code
