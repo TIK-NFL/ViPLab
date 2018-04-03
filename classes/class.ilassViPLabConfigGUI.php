@@ -69,10 +69,6 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		$form->setFormAction($GLOBALS['ilCtrl']->getFormAction($this));
 		$form->setTitle($this->getPluginObject()->txt('form_tab_settings'));
 		
-		$active = new ilCheckboxInputGUI($this->getPluginObject()->txt('form_tab_settings_activate'), 'active');
-		$active->setChecked($settings->isActive());
-		$form->addItem($active);
-		
 		// ecs servers
 		include_once './Services/WebServices/ECS/classes/class.ilECSServerSettings.php';
 		$servers = ilECSServerSettings::getInstance()->getServers();
@@ -222,7 +218,6 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 			$this->getPluginObject()->includeClass('class.ilViPLabSettings.php');
 			$settings = ilViPLabSettings::getInstance();
 			
-			$settings->setActive($form->getInput('active'));
 			$settings->setLogLevel($form->getInput('log_level'));
 			$settings->setECSServerId((int) $form->getInput('ecs'));
 			$settings->setEvaluationMid($form->getInput('evaluation_mid'));

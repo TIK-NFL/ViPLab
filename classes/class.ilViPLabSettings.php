@@ -18,7 +18,6 @@ class ilViPLabSettings
 	 */
 	private $storage = null;
 	
-	private $active = FALSE;
 	/**
 	 * The ECS server id
 	 *
@@ -46,7 +45,7 @@ class ilViPLabSettings
 	private $log_level;
 
 	/**
-	 * Singeleton constructor
+	 * Singleton constructor
 	 */
 	private function __construct()
 	{
@@ -56,7 +55,7 @@ class ilViPLabSettings
 	}
 
 	/**
-	 * Get songeleton instance
+	 * Get singleton instance
 	 *
 	 * @return ilViPLabSettings
 	 */
@@ -67,16 +66,6 @@ class ilViPLabSettings
 			self::$instance = new self();
 		}
 		return self::$instance;
-	}
-
-	public function isActive()
-	{
-		return $this->active;
-	}
-
-	public function setActive($a_stat)
-	{
-		$this->active = $a_stat;
 	}
 
 	/**
@@ -180,7 +169,6 @@ class ilViPLabSettings
 	 */
 	public function update()
 	{
-		$this->getStorage()->set('active', (int) $this->isActive());
 		$this->getStorage()->set('ecs', $this->getECSServerId());
 		
 		$ser_language = serialize($this->getLanguages());
@@ -204,7 +192,6 @@ class ilViPLabSettings
 	 */
 	protected function init()
 	{
-		$this->setActive($this->getStorage()->get('active', $this->active));
 		$this->setECSServerId($this->getStorage()->get('ecs', $this->ecsServerId));
 		$this->setLanguages(unserialize($this->getStorage()->get('languages', serialize($this->languages))));
 		$this->setLogLevel($this->getStorage()->get('log_level', $this->log_level));
