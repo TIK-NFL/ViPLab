@@ -217,4 +217,6 @@ if($ilDB->tableColumnExists('il_qpl_qst_viplab', 'vip_height'))
 $vipSettings = new ilSetting('ass_viplab');
 $vipSettings->delete('width');
 $vipSettings->delete('height');
+
+$vipSettings->delete('active');
 ?>
