@@ -4,8 +4,8 @@ Ilias Test plugin for ViPLab questions.
 ## Dependencies
 
 The following plugins are __REQUIRED__ to be installed:
-- [ViPLabCron](https://github.com/leifos-gmbh/ViPLabCron)
-- [ViPLabEvent](https://github.com/leifos-gmbh/ViPLabEvent)
+- [ViPLabCron](https://github.com/TIK-NFL/ViPLabCron)
+- [ViPLabEvent](https://github.com/TIK-NFL/ViPLabEvent)
 
 ## Installation
 
