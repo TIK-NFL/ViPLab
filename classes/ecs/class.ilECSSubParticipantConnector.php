@@ -60,6 +60,7 @@ class ilECSSubParticipantConnector extends ilECSConnector
 			
 			ilLoggerFactory::getLogger('viplab')->debug('...got HTTP 201 (created)');
                         ilLoggerFactory::getLogger('viplab')->debug(print_r($ret,true));
+			$ret = strstr($ret,'HTTP/1.1 200 OK');
 			$result = $this->parseResponse($ret);
 					
 			// store new ressource
