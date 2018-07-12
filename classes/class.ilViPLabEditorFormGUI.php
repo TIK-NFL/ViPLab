@@ -87,10 +87,13 @@ class ilViPLabEditorFormGUI extends ilFormPropertyGUI
 	 */
 	function insert($a_tpl)
 	{
+		global $DIC;
+		$tpl = $DIC->ui()->mainTemplate();
 		$a_tpl->setCurrentBlock("prop_custom");
 		$a_tpl->setVariable("CUSTOM_CONTENT", $this->getHtml());
 		$a_tpl->parseCurrentBlock();
-		$a_tpl->addJavaScript($this->viPLabQuestion->getPlugin()->getDirectory() . '/js/editor_init.js');
+		$tpl->addJavaScript($this->viPLabQuestion->getPlugin()->getDirectory() . '/js/editor_init.js');
+		$tpl->addOnLoadCode("ilViPLabInitEditor();");
 	}
 
 	/**

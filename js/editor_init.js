@@ -1,5 +1,3 @@
-$(ilViPLabInitEditor);
-
 function ilViPLabInitEditor()
 {
 	// Add listener to programming language
