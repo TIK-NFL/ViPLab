@@ -365,7 +365,7 @@ class assViPLabGUI extends assQuestionGUI
 	
 	/**
 	 * Create a new solution
-	 * @param int active_id
+	 * @param int active_id the id of the test
 	 * @param int pass
 	 * @param bool force solution generation even for empty solutions
 	 * @return int
@@ -389,11 +389,12 @@ class assViPLabGUI extends assQuestionGUI
 		
 		$sol = (string) $sol_arr[0]['value2'];
 
-		if(!strlen($sol) and !$a_force_empty_solution)
+		if(strlen($sol) || $a_force_empty_solution)
 		{
-			return 0;
+			// create the solution on ecs
+			return $this->getViPLabQuestion()->createSolution($sol);
 		}
-		return $this->getViPLabQuestion()->createSolution($sol);
+		return 0;
 	}
 
 	/**
@@ -521,7 +522,7 @@ class assViPLabGUI extends assQuestionGUI
 	
 	/**
 	 * Write post 
-	 * @param type $always
+	 * @param boolean $always
 	 * @return int
 	 */
 	public function writePostData($always = false)
@@ -532,12 +533,14 @@ class assViPLabGUI extends assQuestionGUI
 	// preview 
 	/**
 	 * Preview of question
-	 * @param type $a_show_question_only
-	 * @param type $showInlineFeedback
-	 * @return type
+	 * @param boolean $a_show_question_only
+	 * @param boolean $showInlineFeedback
+	 * @return string the preview as html string
 	 */
 	public function getPreview($a_show_question_only = FALSE, $showInlineFeedback = FALSE)
 	{
+		global $DIC;
+		$tpl = $DIC->ui()->mainTemplate();
 		include_once './Services/UICore/classes/class.ilTemplate.php';
 		$template = $this->getPlugin()->getTemplate('tpl.il_as_viplab_preview.html');
 		
@@ -571,7 +574,7 @@ class assViPLabGUI extends assQuestionGUI
 		}
 		
 		
-		$GLOBALS['tpl']->addJavaScript($this->getPlugin()->getDirectory().'/js/question_init.js');
+		$tpl->addJavaScript($this->getPlugin()->getDirectory().'/js/question_init.js');
 		
 		return $preview;
 	}
@@ -587,7 +590,9 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	public function getTestOutput($active_id, $pass, $is_question_postponed, $user_post_solutions, $show_specific_inline_feedback)
 	{
-
+		global $DIC;
+		$tpl = $DIC->ui()->mainTemplate();
+		
 		$settings = ilViPLabSettings::getInstance();
 		$this->addSubParticipant();
 		$this->createExercise();
@@ -626,14 +631,14 @@ class assViPLabGUI extends assQuestionGUI
 		
 		$pageoutput = $this->outQuestionPage("", $is_question_postponed, $active_id, $atpl->get());
 		
-		$GLOBALS['tpl']->addJavaScript($this->getPlugin()->getDirectory().'/js/question_init.js');
+		$tpl->addJavaScript($this->getPlugin()->getDirectory().'/js/question_init.js');
 		return $pageoutput;
 	}
 	
 
 	/**
 	 * Show solution output
-	 * @param integer $active_id             The active user id
+	 * @param integer $active_id             The active id
 	 * @param integer $pass                  The test pass
 	 * @param boolean $graphicalOutput       Show visual feedback for right/wrong answers
 	 * @param boolean $result_output         Show the reached points for parts of the question
@@ -682,7 +687,6 @@ class assViPLabGUI extends assQuestionGUI
 			
 			$soltpl->setCurrentBlock('complete');
 			$soltpl->setVariable('VIP_APP_ID',$this->getViPLabQuestion()->getId());
-			$soltpl->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
 			$soltpl->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
 			$soltpl->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 			$soltpl->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
