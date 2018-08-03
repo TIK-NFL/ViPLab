@@ -140,21 +140,12 @@ class assViPLabGUI extends assQuestionGUI
 		return $this->object;
 	}
 	
-	protected function getSelfAssessmentEditingMode()
-	{
-		return FALSE;
-	}
-	
-	protected function getDefaultNrOfTries()
-	{
-		return 1;
-	}
-	
 	/**
-	 * Init question form
-	 * return ilPropertyFormGUI
+	 * Init edit question form.
+	 * The code editor can optianal be shown.
+	 * @return ilPropertyFormGUI the edit question form
 	 */
-	protected function initQuestionForm($a_show_editor = FALSE)
+	protected function initEditQuestionForm($a_show_editor = FALSE)
 	{
 		global $lng;
 
@@ -167,39 +158,7 @@ class assViPLabGUI extends assQuestionGUI
 		$form->setTableWidth("100%");
 		$form->setId("viplabquestion");
 
-		// title
-		$title = new ilTextInputGUI($this->lng->txt("title"), "title");
-		$title->setValue($this->object->getTitle());
-		$title->setRequired(TRUE);
-		$form->addItem($title);
-
-		if (!$this->getSelfAssessmentEditingMode())
-		{
-			// author
-			$author = new ilTextInputGUI($this->lng->txt("author"), "author");
-			$author->setValue($this->object->getAuthor());
-			$author->setRequired(TRUE);
-			$form->addItem($author);
-
-			// description
-			$description = new ilTextInputGUI($this->lng->txt("description"), "comment");
-			$description->setValue($this->object->getComment());
-			$description->setRequired(FALSE);
-			$form->addItem($description);
-		}
-		else
-		{
-			// author as hidden field
-			$hi = new ilHiddenInputGUI("author");
-			$author = ilUtil::prepareFormOutput($this->object->getAuthor());
-			if (trim($author) == "")
-			{
-				$author = "-";
-			}
-			$hi->setValue($author);
-			$form->addItem($hi);
-		}
-		
+		$this->addBasicQuestionFormProperties($form);
 		
 		$lang = new ilSelectInputGUI($this->getPlugin()->txt('editor_lang'),'language');
 		$lang->setValue($this->object->getVipLang());
@@ -211,68 +170,6 @@ class assViPLabGUI extends assQuestionGUI
 		$lang->setOptions($options);
 		$lang->setRequired(TRUE);
 		$form->addItem($lang);
-
-		// questiontext
-		$this->object->getPlugin()->includeClass("class.ilViPLabTextAreaInputGUI.php");
-		$question = new ilViPLabTextAreaInputGUI($this->lng->txt("question"), "question");
-		$question->setValue($this->object->prepareTextareaOutput($this->object->getQuestion()));
-		$question->setRequired(TRUE);
-		$question->setRows(10);
-		$question->setCols(80);
-		if (!$this->getSelfAssessmentEditingMode())
-		{
-			$question->setUseRte(TRUE);
-			include_once "./Services/AdvancedEditing/classes/class.ilObjAdvancedEditing.php";
-			$tags = ilObjAdvancedEditing::_getUsedHTMLTags("assessment");
-			array_push($tags, 'input');
-			array_push($tags, 'select');
-			array_push($tags, 'option');
-			array_push($tags, 'button');
-			$question->setRteTags($tags);
-			$question->addPlugin("latex");
-			$question->addButton("latex");
-			$question->addButton("pastelatex");
-			$question->setRTESupport($this->object->getId(), "qpl", "assessment");
-		}
-		$form->addItem($question);
-
-		if (!$this->getSelfAssessmentEditingMode())
-		{
-			// duration
-			$duration = new ilDurationInputGUI($this->lng->txt("working_time"), "Estimated");
-			$duration->setShowHours(TRUE);
-			$duration->setShowMinutes(TRUE);
-			$duration->setShowSeconds(TRUE);
-			$ewt = $this->object->getEstimatedWorkingTime();
-			$duration->setHours($ewt["h"]);
-			$duration->setMinutes($ewt["m"]);
-			$duration->setSeconds($ewt["s"]);
-			$duration->setRequired(FALSE);
-			$form->addItem($duration);
-		}
-		else
-		{
-			// number of tries
-			if (strlen($this->object->getNrOfTries()))
-			{
-				$nr_tries = $this->object->getNrOfTries();
-			}
-			else
-			{
-				$nr_tries = $this->getDefaultNrOfTries();
-			}
-			if ($nr_tries <= 0)
-			{
-				$nr_tries = 1;
-			}
-			$ni = new ilNumberInputGUI($this->lng->txt("qst_nr_of_tries"), "nr_of_tries");
-			$ni->setValue($nr_tries);
-			$ni->setMinValue(1);
-			$ni->setSize(5);
-			$ni->setMaxLength(5);
-			$ni->setRequired(true);
-			$form->addItem($ni);
-		}
 
 		// points
 		$points = new ilNumberInputGUI($lng->txt("points"), "points");
@@ -335,7 +232,7 @@ class assViPLabGUI extends assQuestionGUI
 		ilECSViPLabRessources::deleteDeprecated();
 		
 		
-		$form = $this->initQuestionForm();
+		$form = $this->initEditQuestionForm();
 		
 		if(!$form->checkInput())
 		{
@@ -355,7 +252,7 @@ class assViPLabGUI extends assQuestionGUI
 		$this->createExercise();
 		
 		// initialize form again with editor
-		$form = $this->initQuestionForm(TRUE);
+		$form = $this->initEditQuestionForm(TRUE);
 
 		$this->getViPLabQuestion()->saveToDb();
 		
@@ -439,7 +336,7 @@ class assViPLabGUI extends assQuestionGUI
 
 		if(!$form instanceof ilPropertyFormGUI)
 		{
-			$form = $this->initQuestionForm();
+			$form = $this->initEditQuestionForm();
 
 		}
 		$this->tpl->setVariable("QUESTION_DATA", $form->getHTML());
@@ -453,7 +350,7 @@ class assViPLabGUI extends assQuestionGUI
 		$this->getViPLabQuestion()->deleteSubParticipant();
 		$this->getViPLabQuestion()->deleteExercise();
 		
-		$form = $this->initQuestionForm();
+		$form = $this->initEditQuestionForm();
 		if($form->checkInput())
 		{
 			$this->writeVipLabQuestionFromForm($form);
@@ -475,7 +372,7 @@ class assViPLabGUI extends assQuestionGUI
 		$this->getViPLabQuestion()->deleteSubParticipant();
 		$this->getViPLabQuestion()->deleteExercise();
 
-		$form = $this->initQuestionForm();
+		$form = $this->initEditQuestionForm();
 		if($form->checkInput())
 		{
 			$this->writeVipLabQuestionFromForm($form);
