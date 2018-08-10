@@ -59,7 +59,7 @@ class ilECSSubParticipantConnector extends ilECSConnector
 			}
 			
 			ilLoggerFactory::getLogger('viplab')->debug('...got HTTP 201 (created)');
-
+			$ret = strstr($ret,'HTTP/1.1 200 OK');
 			$result = $this->parseResponse($ret);
 			
 			// store new ressource
@@ -123,7 +123,9 @@ class ilECSSubParticipantConnector extends ilECSConnector
 		
 		$id = end(explode('/',$location));
 		
-		
+		ilLoggerFactory::getLogger('viplab')->debug('Location:' . $location);
+		ilLoggerFactory::getLogger('viplab')->debug('id:' . $id);
+		ilLoggerFactory::getLogger('viplab')->debug('result-json' . print_r($ecs_result->getResult(), true));
 		$sub = new ilECSSubParticipant($ecs_result->getResult());
 		$sub->setId($id);
 		return $sub;
