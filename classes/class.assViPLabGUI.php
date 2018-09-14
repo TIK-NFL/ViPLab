@@ -261,32 +261,32 @@ class assViPLabGUI extends assQuestionGUI
 	}
 	
 	/**
-	 * Create a new solution
-	 * @param int active_id the id of the test
-	 * @param int pass
-	 * @param bool force solution generation even for empty solutions
+	 * Create a new solution on ecs for the client, using data from ilias database.
+	 *
+	 * @param
+	 *        	int active_id the id of the test
+	 * @param
+	 *        	int pass
+	 * @param
+	 *        	bool force solution generation even for empty solutions
 	 * @return int
 	 */
 	protected function createSolution($a_active_id, $a_pass = null, $a_force_empty_solution = true)
 	{
-		// always create solution
-		//$a_force_empty_solution = true;
-		
-		include_once "./Modules/Test/classes/class.ilObjTest.php";
-		if(!ilObjTest::_getUsePreviousAnswers($a_active_id, true))
-		{
-			if(is_null($a_pass))
-			{
-				$a_pass = ilObjTest::_getPass($a_active_id);
-			}
-		}
 		$sol_arr = $this->getViPLabQuestion()->getUserSolutionPreferingIntermediate($a_active_id, $a_pass);
 		
-		ilLoggerFactory::getLogger('viplab')->debug(print_r($sol_arr,true));
+		include_once "./Modules/Test/classes/class.ilObjTest.php";
+		if (ilObjTest::_getUsePreviousAnswers($a_active_id, true) && count($sol_arr) == 0)
+		{
+			$a_pass = $a_pass ? $a_pass - 1 : $a_pass;
+			$sol_arr = $this->getViPLabQuestion()->getSolutionValues($a_active_id, $a_pass, true);
+		}
+		
+		ilLoggerFactory::getLogger('viplab')->debug(print_r($sol_arr, true));
 		
 		$sol = (string) $sol_arr[0]['value2'];
-
-		if(strlen($sol) || $a_force_empty_solution)
+		
+		if (strlen($sol) || $a_force_empty_solution)
 		{
 			// create the solution on ecs
 			return $this->getViPLabQuestion()->createSolution($sol);
