@@ -26,6 +26,7 @@ class ilECSVipResultConnector extends ilECSConnector
 	 * @param type $a_id
 	 * @return \ilECSResult
 	 * @throws ilECSConnectorException
+	 * @deprecated unused
 	 */
 	public function getResult($a_id)
 	{
@@ -113,6 +114,7 @@ class ilECSVipResultConnector extends ilECSConnector
 	/**
 	 * Delete sub participant
 	 * @param type $a_exc_id
+	 * @deprecated unused
 	 */
 	public function deleteResult($a_exc_id)
 	{
@@ -145,6 +147,7 @@ class ilECSVipResultConnector extends ilECSConnector
 	 * Add Header
 	 * @param string $a_name
 	 * @param string $a_value
+	 * @deprecated
 	 */
 	public function addHeader($a_name,$a_value)
 	{

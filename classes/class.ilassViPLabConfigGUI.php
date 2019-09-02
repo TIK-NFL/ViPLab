@@ -21,19 +21,11 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		global $ilTabs;
 		
 		$ilTabs->addTab('tab_settings', ilassViPLabPlugin::getInstance()->txt('tab_settings'), $GLOBALS['ilCtrl']->getLinkTarget($this, 'configure'));
-		/*
-		 * $ilTabs->addTab(
-		 * 'tab_ecs_ressources',
-		 * ilassViPLabPlugin::getInstance()->txt('tab_ecs_ressources'),
-		 * $GLOBALS['ilCtrl']->getLinkTarget($this, 'listEcsRessources')
-		 * );
-		 */
 		
 		switch ($cmd)
 		{
 			case 'configure':
 			case 'save':
-			case 'listEcsRessources':
 				$this->$cmd();
 				break;
 		
@@ -153,20 +145,6 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		
 		$form->addCommandButton('save', $GLOBALS['lng']->txt('save'));
 		return $form;
-	}
-
-	/**
-	 * Show ecs ressource table
-	 */
-	protected function listEcsRessources()
-	{
-		$GLOBALS['ilTabs']->activateTab('tab_ecs_ressources');
-		
-		$table = new ilEcsRessourcesTableGUI($this, 'listEcsRessources');
-		$table->init();
-		$table->parse();
-		
-		$GLOBALS['tpl']->setContent($table->getHTML());
 	}
 
 	/**
