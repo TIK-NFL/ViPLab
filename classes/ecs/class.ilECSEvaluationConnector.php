@@ -120,6 +120,7 @@ class ilECSEvaluationConnector extends ilECSConnector
 	 * Add Header
 	 * @param string $a_name
 	 * @param string $a_value
+	 * @deprecated
 	 */
 	public function addHeader($a_name,$a_value)
 	{

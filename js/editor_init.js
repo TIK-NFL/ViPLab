@@ -1,5 +1,3 @@
-YAHOO.util.Event.onDOMReady(ilViPLabInitEditor,prefix = new String(""));
-
 function ilViPLabInitEditor()
 {
 	// Add listener to programming language

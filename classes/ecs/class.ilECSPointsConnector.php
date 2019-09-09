@@ -38,7 +38,8 @@ class ilECSPointsConnector extends ilECSConnector
 			$this->prepareConnection();
 			$this->addHeader('Content-Type', 'application/json');
 			$this->addHeader('Accept', 'application/json');
-
+			$this->curl->setOpt(CURLOPT_CUSTOMREQUEST, 'DELETE');
+			
 			$res = $this->call();
 
 			// Checking status code
@@ -61,6 +62,7 @@ class ilECSPointsConnector extends ilECSConnector
 	 * Add Header
 	 * @param string $a_name
 	 * @param string $a_value
+	 * @deprecated
 	 */
 	public function addHeader($a_name,$a_value)
 	{
