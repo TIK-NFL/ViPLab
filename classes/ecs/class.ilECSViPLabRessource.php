@@ -122,7 +122,7 @@ class ilECSViPLabRessource
 		$query = 'SELECT * FROM il_qpl_qst_viplab_res '.
 				'WHERE id = '. $this->getDB()->quote($this->getId(),'integer');
 		$res = $this->getDB()->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$this->id = $row->id;
 			$this->ressource_id = $row->res_id;

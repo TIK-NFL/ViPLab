@@ -24,7 +24,7 @@ class ilECSViPLabRessources
 		$res = $ilDB->query($query);
 		
 		$ressources = array();
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$ressources[] = new ilECSViPLabRessource($row->id);
 		}
@@ -38,7 +38,7 @@ class ilECSViPLabRessources
 		$query = 'SELECT id from il_qpl_qst_viplab_res ' .
 				'WHERE create_dt < ' . $ilDB->quote(time() - self::MAX_AGE_SECONDS, 'integer');
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$ressource = new ilECSViPLabRessource($row->id);
 			try {
