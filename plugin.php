@@ -12,6 +12,6 @@ $ilias_min_version = "5.2.1";
 $ilias_max_version = "5.3.999";
 
 // add the responsible person for the plugin
-$responsible = "Stefan Meyer"; 
-$responsible_mail = "smeyer.ilias@gmx.de";
+$responsible = "Per Pascal Seeland"; 
+$responsible_mail = "pascal.seeland@tik.uni-stuttgart.de";
 ?>
