@@ -622,7 +622,7 @@ class assViPLabGUI extends assQuestionGUI
 		return $solutionoutput;
 	}
 
-	public function getSpecificFeedbackOutput($active_id, $pass)
+	public function getSpecificFeedbackOutput($userSolution)
 	{
 	}
 
