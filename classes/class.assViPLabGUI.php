@@ -229,8 +229,6 @@ class assViPLabGUI extends assQuestionGUI
 	protected function initEditor()
 	{
 		global $DIC;
-		ilECSViPLabRessources::deleteDeprecated();
-		
 		
 		$form = $this->initEditQuestionForm();
 		
