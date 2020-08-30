@@ -304,10 +304,16 @@ class assViPLab extends assQuestion
 		}
 		// duplicate the question in database
 		$this_id = $this->getId();
-        $clone = $this;
+        $clone = clone $this;
         include_once ("./Modules/TestQuestionPool/classes/class.assQuestion.php");
         $original_id = assQuestion::_getOriginalId($this->id);
-        $clone->id = -1;
+		$clone->id = -1;
+		
+		if ((int) $a_test_obj_id > 0)
+        {
+        	$clone->setObjId($a_test_obj_id);
+		}
+				
 		if ($title)
 		{
 			$clone->setTitle($title);
@@ -411,7 +417,8 @@ class assViPLab extends assQuestion
 		// copy XHTML media objects
 		$clone->copyXHTMLMediaObjectsOfQuestion($original_id);
 		// duplicate the generic feedback
-		$clone->duplicateGenericFeedback($original_id);
+		// TODO figure out new way for feedback copy in question pools
+		//$clone->duplicateGenericFeedback($original_id);
 
 		return $clone->id;
 	}

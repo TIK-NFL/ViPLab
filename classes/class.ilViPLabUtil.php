@@ -79,7 +79,7 @@ class ilViPLabUtil
 		{
 			ilLoggerFactory::getLogger('viplab')->warning('Failed opening zip archive');
 		}
-		return $a_solution;
+		return; 
 	}
 }
 ?>
