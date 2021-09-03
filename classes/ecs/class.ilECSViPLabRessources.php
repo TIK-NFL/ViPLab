@@ -9,7 +9,10 @@
  */
 class ilECSViPLabRessources
 {
-	const MAX_AGE_SECONDS = 10800;
+	// Remove old resources after 48h
+	const MAX_AGE_SECONDS = 48*3600;
+        // Number of old resources to delete in each cron run
+	const REMOVE_IN_EACH_CRONEXECUTION = 5000;
 
 	/**
 	 * Get ressources
@@ -36,7 +39,8 @@ class ilECSViPLabRessources
 		global $ilDB;
 		
 		$query = 'SELECT id from il_qpl_qst_viplab_res ' .
-				'WHERE create_dt < ' . $ilDB->quote(time() - self::MAX_AGE_SECONDS, 'integer');
+				'WHERE create_dt < ' . $ilDB->quote(time() - self::MAX_AGE_SECONDS, 'integer') .
+                                ' limit ' .$ilDB->quote(self::REMOVE_IN_EACH_CRONEXECUTION, 'integer');
 		$res = $ilDB->query($query);
 		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
