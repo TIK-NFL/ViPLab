@@ -546,10 +546,13 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	public function getSolutionOutput($active_id, $pass = NULL, $graphicalOutput = FALSE, $result_output = FALSE, $show_question_only = TRUE, $show_feedback = FALSE, $show_correct_solution = FALSE, $show_manual_scoring = FALSE, $show_question_text = TRUE)
 	{
-		if((int) $_REQUEST['viplab_editor_initialized_'.$this->getViPLabQuestion()->getId()] == '1')
-		{
-			$initialized = TRUE;
-		}
+		$viplab_editor_initialized = (int) $_REQUEST['viplab_editor_initialized_'.$this->getViPLabQuestion()->getId()] == '1';
+
+		// Show the ViPLab editor immediately for answer details (e.g., used in test scoring by question).
+		$answer_detail_requested = $this->ctrl->getCmd() == 'getAnswerDetail';
+
+		$viplab_editor_showable = $viplab_editor_initialized || $answer_detail_requested;
+
 		if(!$show_manual_scoring)
 		{
 			return '';
@@ -559,7 +562,7 @@ class assViPLabGUI extends assQuestionGUI
 		$soltpl->setVariable('SOLUTION_TXT', $this->object->prepareTextareaOutput($this->object->getQuestion(), TRUE));
 		
 		// show editor button
-		if(!$initialized)
+		if(!$viplab_editor_showable)
 		{			
 			$soltpl->setCurrentBlock('incomplete');
 			$soltpl->setVariable('EDITOR_INIT',$this->getPlugin()->txt('editor_start'));
@@ -581,6 +584,7 @@ class assViPLabGUI extends assQuestionGUI
 			$settings = ilViPLabSettings::getInstance();
 			
 			$soltpl->setCurrentBlock('complete');
+			$soltpl->setVariable('ACTIVE_ID',$active_id);
 			$soltpl->setVariable('VIP_APP_ID',$this->getViPLabQuestion()->getId());
 			$soltpl->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
 			$soltpl->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
