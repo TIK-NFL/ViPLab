@@ -551,11 +551,10 @@ class assViPLabGUI extends assQuestionGUI
 		// Show the ViPLab editor immediately for answer details (e.g., used in test scoring by question).
 		$answer_detail_requested = $this->ctrl->getCmd() == 'getAnswerDetail';
 
-		$viplab_editor_showable = $viplab_editor_initialized || $answer_detail_requested;
+		$viplab_editor_showable = $viplab_editor_initialized || $answer_detail_requested || !$show_question_only;
 
-		if(!$show_manual_scoring)
-		{
-			return '';
+		if ($show_correct_solution) {
+			return '';  // not implemented
 		}
 		
 		$soltpl = $this->getPlugin()->getTemplate('tpl.viplab_solution_output.html');
