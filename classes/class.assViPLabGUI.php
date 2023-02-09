@@ -446,29 +446,29 @@ class assViPLabGUI extends assQuestionGUI
 				true)
 		);
 		
-		$template->setCurrentBlock('complete');
-		
 		$settings = ilViPLabSettings::getInstance();
 		$this->addSubParticipant();
 		$this->createExercise();
 		
-		$template->setVariable('VIP_ID', $this->getViPLabQuestion()->getId());
+		$template->setVariable('INSTANCE_ID', $this->getViPLabQuestion()->getId());
 		$template->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
 		$template->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
 		$template->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
 		$template->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
+		$template->setVariable('ROOT', $this->getPlugin()->getDirectory());
 		$template->setVariable('INITJS',$this->getPlugin()->getDirectory().'/templates');
-		
-		$template->parseCurrentBlock();
-		
-		
-		$preview = $template->get();
-		if(!$a_show_question_only)
-		{
-			$preview = $this->getILIASPage($preview);
+
+		// Determine whether the editor can be displayed immediately, i.e. without the start button.
+		if ($a_show_question_only) {
+			$template->setVariable('IMMEDIATE_INIT');
+		} else {
+			$template->setVariable('DEFERRED_INIT');
+			$template->setVariable('EDITOR_START', $this->getPlugin()->txt('editor_start'));
 		}
-		
-		
+
+		$preview = $template->get();
+		$preview = !$a_show_question_only ? $this->getILIASPage($preview) : $preview;
+
 		$tpl->addJavaScript($this->getPlugin()->getDirectory().'/js/question_init.js');
 		
 		return $preview;
