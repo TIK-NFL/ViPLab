@@ -1,39 +1,23 @@
 <p>{SOLUTION_TXT}</p>
-<!-- BEGIN incomplete -->
-<div id="teacher_button_toggle" >
-    <input class="submit" id="viplab_editor_btn_{VIPEDITOR_ID}" name="cmd[showManScoringParticipantScreen]" value="{EDITOR_INIT}" type="submit" />
-    <input type="hidden" id="viplab_editor_initialized_{VIPEDITOR_ID}" name="viplab_editor_initialized_{VIPEDITOR_ID}" value="0" />
-    <script>
-        $("#viplab_editor_btn_{VIPEDITOR_ID}").click(function ()
-            {
-                $("#viplab_editor_initialized_{VIPEDITOR_ID}").val("1");
-            }
-        );
-    </script>
-    <noscript>
-        <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
-            Your web browser must have JavaScript enabled in order for this application to display correctly.
-        </div>
-    </noscript>
-</div>
-<!-- END incomplete -->
-<!-- BEGIN complete -->
-<div id="teacher_applet_placeholder" style="position: relative; width: 100%; height: 85vh; top: 3ex">
-    <div id="teacher_applet_toggle_{ACTIVE_ID}" style="position: relative; width: 100%; height: 80vh">
-        <script type="text/javascript">GWT_INSTANCE_ID = {ACTIVE_ID}</script>  <!-- must precede teacher.nocache.js -->
-
+<div id="teacher_applet_placeholder" style="position: relative; width: 100%">
+    <div id="teacher_applet_toggle_{INSTANCE_ID}" style="position: relative; width: 100%">
         <meta name="gwt:property" content="locale=<%=request.getLocale()%>">
-        <meta name="viplab:{ACTIVE_ID}:ecslocation" content="{VIP_ECS_URL}/numlab">
-        <meta name="viplab:{ACTIVE_ID}:exercise" content="{VIP_EXERCISE}">
-        <meta name="viplab:{ACTIVE_ID}:evaluation" content="{VIP_EVALUATION}">
-        <meta name="viplab:{ACTIVE_ID}:solution" content="{VIP_SOLUTION}">
-        <meta name="viplab:{ACTIVE_ID}:result" content="{VIP_RESULT}">
-        <meta name="viplab:{ACTIVE_ID}:cookie" content="{VIP_COOKIE}">
-        <meta name="viplab:{ACTIVE_ID}:compmid" content="{VIP_MID}">
-        <meta name="viplab:{ACTIVE_ID}:ptscallback" content="vipCorrectionHint">
-        <meta name="viplab:{ACTIVE_ID}:container" content="teacher_applet_toggle_{ACTIVE_ID}">
+        <meta name="viplab:{INSTANCE_ID}:ecslocation" content="{VIP_ECS_URL}/numlab">
+        <meta name="viplab:{INSTANCE_ID}:exercise" content="{VIP_EXERCISE}">
+        <meta name="viplab:{INSTANCE_ID}:evaluation" content="{VIP_EVALUATION}">
+        <meta name="viplab:{INSTANCE_ID}:solution" content="{VIP_SOLUTION}">
+        <meta name="viplab:{INSTANCE_ID}:result" content="{VIP_RESULT}">
+        <meta name="viplab:{INSTANCE_ID}:cookie" content="{VIP_COOKIE}">
+        <meta name="viplab:{INSTANCE_ID}:compmid" content="{VIP_MID}">
+        <meta name="viplab:{INSTANCE_ID}:ptscallback" content="vipCorrectionHint">
+        <meta name="viplab:{INSTANCE_ID}:container" content="teacher_applet_toggle_{INSTANCE_ID}">
 
-        <script src="{INITJS}/teacher/teacher.nocache.js" type="text/javascript"></script>
+        <!--                                           -->
+        <!-- This script loads your compiled module.   -->
+        <!-- If you add any GWT meta tags, they must   -->
+        <!-- be added before this line.                -->
+        <!--                                           -->
+        <script src="{ROOT}/js/teacher_init.js" type="text/javascript"></script>
         <script src="{INITJS}/ace/ace.js" type="text/javascript" charset="utf-8"></script>
         <script src="{INITJS}/ace/theme-eclipse.js" type="text/javascript" charset="utf-8"></script>
         <script src="{INITJS}/ace/theme-katzenmilch.js" type="text/javascript" charset="utf-8"></script>
@@ -44,6 +28,15 @@
         <script src="{INITJS}/ace/mode-r.js" type="text/javascript" charset="utf-8"></script>
         <script src="{INITJS}/ace/mode-plain_text.js" type="text/javascript" charset="utf-8"></script>
         <script src="{INITJS}/jszip/jszip.min.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- BEGIN immediate_init --><!-- {IMMEDIATE_INIT} -->
+        <script>init_teacher('{INITJS}/teacher/teacher.nocache.js', '{INSTANCE_ID}')</script>
+        <!-- END immediate_init -->
+
+        <!-- BEGIN deferred_init --><!-- {DEFERRED_INIT} -->
+        <button id="init_teacher_{INSTANCE_ID}" onclick="init_teacher('{INITJS}/teacher/teacher.nocache.js', '{INSTANCE_ID}')">{EDITOR_START}</button>
+        <!-- END deferred_init -->
+
         <!--                                           -->
         <!-- The body can have arbitrary html, or      -->
         <!-- you can leave the body empty if you want  -->
@@ -64,4 +57,3 @@
         </script>
     </div>
 </div>
-<!-- END complete -->

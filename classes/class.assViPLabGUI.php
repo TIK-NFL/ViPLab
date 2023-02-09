@@ -546,13 +546,6 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	public function getSolutionOutput($active_id, $pass = NULL, $graphicalOutput = FALSE, $result_output = FALSE, $show_question_only = TRUE, $show_feedback = FALSE, $show_correct_solution = FALSE, $show_manual_scoring = FALSE, $show_question_text = TRUE)
 	{
-		$viplab_editor_initialized = (int) $_REQUEST['viplab_editor_initialized_'.$this->getViPLabQuestion()->getId()] == '1';
-
-		// Show the ViPLab editor immediately for answer details (e.g., used in test scoring by question).
-		$answer_detail_requested = $this->ctrl->getCmd() == 'getAnswerDetail';
-
-		$viplab_editor_showable = $viplab_editor_initialized || $answer_detail_requested || !$show_question_only;
-
 		if ($show_correct_solution) {
 			return '';  // not implemented
 		}
@@ -560,55 +553,57 @@ class assViPLabGUI extends assQuestionGUI
 		$soltpl = $this->getPlugin()->getTemplate('tpl.viplab_solution_output.html');
 		$soltpl->setVariable('SOLUTION_TXT', $this->object->prepareTextareaOutput($this->object->getQuestion(), TRUE));
 		
-		// show editor button
-		if(!$viplab_editor_showable)
-		{			
-			$soltpl->setCurrentBlock('incomplete');
-			$soltpl->setVariable('EDITOR_INIT',$this->getPlugin()->txt('editor_start'));
-			$soltpl->setVariable('VIPEDITOR_ID',$this->getViPLabQuestion()->getId());
-			$soltpl->parseCurrentBlock();
+		$this->getViPLabQuestion()->deleteSubParticipant();
+		$this->addSubParticipant();
+
+		$this->getViPLabQuestion()->deleteExercise();
+		$this->createExercise();
+
+		$sol_id = $this->createSolution($active_id, $pass, true);
+		$eva_id = $this->createEvaluation();
+
+		$settings = ilViPLabSettings::getInstance();
+
+		$soltpl->setVariable('INSTANCE_ID',$active_id . '-' . $this->getViPLabQuestion()->getId());
+		$soltpl->setVariable('ACTIVE_ID',$active_id);
+		$soltpl->setVariable('VIP_APP_ID',$this->getViPLabQuestion()->getId());
+		$soltpl->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
+		$soltpl->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
+		$soltpl->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
+		$soltpl->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
+		$soltpl->setVariable('VIP_EVALUATION', ilECSEvaluationConnector::RESOURCE_PATH.'/'.$eva_id);
+		$soltpl->setVariable('ROOT', $this->getPlugin()->getDirectory());
+		$soltpl->setVariable('INITJS',$this->getPlugin()->getDirectory().'/templates');
+
+		// `active_id` makes up the solution id for the resource on the ECS. However, `active_id` is not provided in
+		// Modules/Test/classes/class.ilObjTestGUI.php:printobject() thus omitting the solution for printing.
+		$sol_path = ilECSSolutionConnector::RESOURCE_PATH.'/'.$sol_id;
+		$sol_path_val = $this->ctrl->getCmd() != 'print' ? $sol_path : '';
+		$soltpl->setVariable('VIP_SOLUTION',  $sol_path_val);
+
+		if($this->getViPLabQuestion()->getVipResultStorage())
+		{
+			$res_id = $this->createResult($active_id, $pass);
+			$soltpl->setVariable('VIP_RESULT', ilECSVipResultConnector::RESOURCE_PATH.'/'.$res_id);
 		}
-		// show viplab applet
 		else
 		{
-			$this->getViPLabQuestion()->deleteSubParticipant();
-			$this->addSubParticipant();
-		
-			$this->getViPLabQuestion()->deleteExercise();
-			$this->createExercise();
-			
-			$sol_id = $this->createSolution($active_id, $pass, true);
-			$eva_id = $this->createEvaluation();
-			
-			$settings = ilViPLabSettings::getInstance();
-			
-			$soltpl->setCurrentBlock('complete');
-			$soltpl->setVariable('ACTIVE_ID',$active_id);
-			$soltpl->setVariable('VIP_APP_ID',$this->getViPLabQuestion()->getId());
-			$soltpl->setVariable('VIP_ECS_URL', $settings->getECSServer()->getServerURI());
-			$soltpl->setVariable('VIP_COOKIE',$this->getViPLabQuestion()->getVipCookie());
-			$soltpl->setVariable('VIP_MID',$settings->getLanguageMid($this->getViPLabQuestion()->getVipLang()));
-			$soltpl->setVariable('VIP_EXERCISE',  ilECSExerciseConnector::RESOURCE_PATH.'/'.$this->getViPLabQuestion()->getVipExerciseId());
-			$soltpl->setVariable('VIP_SOLUTION',  ilECSSolutionConnector::RESOURCE_PATH.'/'.$sol_id);
-			$soltpl->setVariable('VIP_EVALUATION', ilECSEvaluationConnector::RESOURCE_PATH.'/'.$eva_id);
-			$soltpl->setVariable('INITJS',$this->getPlugin()->getDirectory().'/templates'); 
-			
-			if($this->getViPLabQuestion()->getVipResultStorage())
-			{
-				$res_id = $this->createResult($active_id, $pass);
-				$soltpl->setVariable('VIP_RESULT', ilECSVipResultConnector::RESOURCE_PATH.'/'.$res_id);
-			}
-			else
-			{
-				$soltpl->setVariable('VIP_RESULT', '');
-			}
-			
-			$soltpl->setVariable('VIP_LANG',$this->getViPLabQuestion()->getVipLang(true));
-
-			$soltpl->setVariable('VIP_STORED_EXERCISE', $this->getViPLabQuestion()->getVipExerciseId());
-			$soltpl->setVariable('VIP_STORED_PARTICIPANT',$this->getViPLabQuestion()->getVipSubId());
+			$soltpl->setVariable('VIP_RESULT');
 		}
-		
+
+		$soltpl->setVariable('VIP_LANG',$this->getViPLabQuestion()->getVipLang(true));
+		$soltpl->setVariable('VIP_STORED_EXERCISE', $this->getViPLabQuestion()->getVipExerciseId());
+		$soltpl->setVariable('VIP_STORED_PARTICIPANT',$this->getViPLabQuestion()->getVipSubId());
+
+		// Determine whether the editor can be displayed immediately, i.e. without the start button.
+		$immediate_init = $this->ctrl->getCmd() == 'getAnswerDetail' || $this->ctrl->getCmd() == 'outCorrectSolution';
+		if ($immediate_init) {
+			$soltpl->setVariable('IMMEDIATE_INIT');
+		} else {
+			$soltpl->setVariable('DEFERRED_INIT');
+			$soltpl->setVariable('EDITOR_START', $this->getPlugin()->txt('editor_start'));
+		}
+
 		$qst_txt = $soltpl->get();
 		
 		$solutiontemplate = new ilTemplate("tpl.il_as_tst_solution_output.html",TRUE, TRUE, "Modules/TestQuestionPool");
