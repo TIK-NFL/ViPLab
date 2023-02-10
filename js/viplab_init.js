@@ -3,6 +3,7 @@ function init_viplab(source, instance_id) {
     script = document.createElement('script');
     script.setAttribute('type', 'text/javascript');
     script.setAttribute('src', source);
+    script.onload = function() { viplab.onInjectionDone('viplab'); };
     document.getElementById('student_applet_toggle_' + instance_id).appendChild(script);
     document.getElementById('student_applet_toggle_' + instance_id).style.height = '80vh';
     document.dispatchEvent(new Event("DOMContentLoaded"));
