@@ -161,6 +161,7 @@ class assViPLabGUI extends assQuestionGUI
 		$this->addBasicQuestionFormProperties($form);
 		
 		$lang = new ilSelectInputGUI($this->getPlugin()->txt('editor_lang'),'language');
+		$lang->setInfo($this->getPlugin()->txt('prog_lang_info'));
 		$lang->setValue($this->object->getVipLang());
 		$options[''] = $this->lng->txt('select_one');
 		foreach(ilViPLabSettings::getInstance()->getLanguages() as $lang_key => $mid)
@@ -169,6 +170,7 @@ class assViPLabGUI extends assQuestionGUI
 		}
 		$lang->setOptions($options);
 		$lang->setRequired(TRUE);
+		$lang->setDisabled($this->getViPLabQuestion()->getVipSubId());
 		$form->addItem($lang);
 
 		// points

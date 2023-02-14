@@ -21,6 +21,7 @@ editor_lang#:#Programmiersprache
 ecs_mid#:#Mid
 editor#:#Fragen-Editor
 editor_start#:#Starte Editor
+prog_lang_info#:#Nach dem Speichern kann die Programmiersprache für diese Aufgabe nicht mehr geändert werden.
 store_results#:#Speichern der Rechenergebnisse
 store_results_info#:#Wenn aktiviert, werden die Ergebnisse der Lösungen gespeichert, um sie bei der manuellen Bewertung nicht neu berechnen zu müssen.
 form_tab_settings_loglevel#:#Log-Level
