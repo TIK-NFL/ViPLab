@@ -549,7 +549,7 @@ class assViPLabGUI extends assQuestionGUI
 	public function getSolutionOutput($active_id, $pass = NULL, $graphicalOutput = FALSE, $result_output = FALSE, $show_question_only = TRUE, $show_feedback = FALSE, $show_correct_solution = FALSE, $show_manual_scoring = FALSE, $show_question_text = TRUE)
 	{
 		if ($show_correct_solution) {
-			return '';  // not implemented
+			return $this->getGenericFeedbackOutputForCorrectSolution();
 		}
 		
 		$soltpl = $this->getPlugin()->getTemplate('tpl.viplab_solution_output.html');

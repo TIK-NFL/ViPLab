@@ -466,6 +466,11 @@ class assViPLab extends assQuestion
 
 		return $points;
 	}
+
+	protected function calculateReachedPointsForSolution($solution)
+	{
+		return 0;  // since instant feedback is not supported by ViPLab
+	}
 	
 
 	/**
@@ -695,6 +700,10 @@ class assViPLab extends assQuestion
 		return $user_solution;
 	}
 	
+
+	public function getSolutionSubmit() {
+		return array();  // instant feedback preview is not supported by ViPLab
+	}
 
 	/**
 	 * Delete exercise
