@@ -589,7 +589,8 @@ class assViPLabGUI extends assQuestionGUI
 		if($this->getViPLabQuestion()->getVipResultStorage())
 		{
 			$res_id = $this->createResult($active_id, $pass);
-			$soltpl->setVariable('VIP_RESULT', ilECSVipResultConnector::RESOURCE_PATH.'/'.$res_id);
+			$vip_res_path = $res_id ? ilECSVipResultConnector::RESOURCE_PATH . '/' . $res_id : '';
+			$soltpl->setVariable('VIP_RESULT', $vip_res_path);
 		}
 		else
 		{
