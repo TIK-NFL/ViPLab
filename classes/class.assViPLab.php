@@ -669,9 +669,19 @@ class assViPLab extends assQuestion
 	*/
 	function fromXML(&$item, &$questionpool_id, &$tst_id, &$tst_object, &$question_counter, &$import_mapping, array $solutionhints = [])
 	{
-		#$this->getPlugin()->includeClass("import/qti12/class.assMathematikOnlineImport.php");
-		#$import = new assMathematikOnlineImport($this);
-		#$import->fromXML($item, $questionpool_id, $tst_id, $tst_object, $question_counter, $import_mapping);
+		$this->getPlugin()->includeClass("./import/qti12/class." . $this->getQuestionType() . "Import.php");
+		$classname = $this->getQuestionType() . "Import";
+		$import = new $classname($this);
+		$import->fromXML($item, $questionpool_id, $tst_id, $tst_object, $question_counter, $import_mapping);
+
+		foreach ($solutionhints as $hint) {
+			$h = new ilAssQuestionHint();
+			$h->setQuestionId($import->getQuestionId());
+			$h->setIndex($hint['index']);
+			$h->setPoints($hint['points']);
+			$h->setText($hint['txt']);
+			$h->save();
+		}
 	}
 	
 	/**
@@ -683,9 +693,10 @@ class assViPLab extends assQuestion
 	*/
 	function toXML($a_include_header = true, $a_include_binary = true, $a_shuffle = false, $test_output = false, $force_image_references = false)
 	{
-		#$this->getPlugin()->includeClass("export/qti12/class.assMathematikOnlineExport.php");
-		#$export = new assMathematikOnlineExport($this);
-		#return $export->toXML($a_include_header, $a_include_binary, $a_shuffle, $test_output, $force_image_references);
+		$this->getPlugin()->includeClass("./export/qti12/class." . $this->getQuestionType() . "Export.php");
+		$classname = $this->getQuestionType() . "Export";
+		$export = new $classname($this);
+		return $export->toXML($a_include_header, $a_include_binary, $a_shuffle, $test_output, $force_image_references);
 	}
 
 	/**
