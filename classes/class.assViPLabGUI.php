@@ -552,9 +552,20 @@ class assViPLabGUI extends assQuestionGUI
 			return $this->getGenericFeedbackOutputForCorrectSolution();
 		}
 
-		// In case of outCorrectSolution (feedback), show the readonly editor to the student. Otherwise, use the solution output for teachers.
-		$tpl = $this->ctrl->getCmd() == 'outCorrectSolution' ? 'tpl.applet_solution.html' : 'tpl.viplab_solution_output.html';
-		$soltpl = $this->getPlugin()->getTemplate($tpl);
+		// In case of feedbacks, post reviews, etc. show the readonly editor to the student.
+		// Otherwise, use the solution output for teachers containing more options.
+		switch ($this->ctrl->getCmd()) {
+			case 'show':
+			case 'outCorrectSolution':
+			case 'outUserPassDetails':
+			case 'outUserListOfAnswerPasses':
+				// student template
+				$soltpl = $this->getPlugin()->getTemplate('tpl.applet_solution.html');
+				break;
+			default:
+				// teacher template
+				$soltpl = $this->getPlugin()->getTemplate('tpl.viplab_solution_output.html');
+		}
 
 		$soltpl->setVariable('SOLUTION_TXT', $this->object->prepareTextareaOutput($this->object->getQuestion(), TRUE));
 		
