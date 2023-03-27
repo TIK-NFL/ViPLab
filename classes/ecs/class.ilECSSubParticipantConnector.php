@@ -59,7 +59,12 @@ class ilECSSubParticipantConnector extends ilECSConnector
 			}
 			
 			ilLoggerFactory::getLogger('viplab')->debug('...got HTTP 201 (created)');
-			$ret = strstr($ret,'HTTP/1.1 200 OK');
+
+			// Accept only HTTP/1.1 or HTTP/2 200 responses.
+			$http1_resp = strstr($ret, 'HTTP/1.1 200 OK');
+			$http2_resp = strstr($ret, 'HTTP/2 200');
+			$ret = $http1_resp . $http2_resp;
+
 			$result = $this->parseResponse($ret);
 			
 			// store new ressource
