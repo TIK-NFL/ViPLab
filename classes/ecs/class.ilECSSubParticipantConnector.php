@@ -120,13 +120,11 @@ class ilECSSubParticipantConnector extends ilECSConnector
 	 */
 	protected function parseResponse($return_str)
 	{
-		$ecs_result = new ilECSResult($return_str,TRUE);
+		$this->curl->parseResponse($return_str);
+		$ecs_result = new ilECSResult($this->curl->getResponseBody());
 
-		// parse location
-		$headers = $ecs_result->getHeaders();
-		$location  = $headers['Location'];
-		
-		$id = end(explode('/',$location));
+		$location = $this->getResponseHeaderFieldValue($this->curl->getResponseHeaderArray(), 'Location');
+		$id = end(explode('/', $location));
 		
 		ilLoggerFactory::getLogger('viplab')->debug('Location:' . $location);
 		ilLoggerFactory::getLogger('viplab')->debug('id:' . $id);
@@ -136,6 +134,14 @@ class ilECSSubParticipantConnector extends ilECSConnector
 		return $sub;
 	}
 
-	
+	public function getResponseHeaderFieldValue($header_array, $header_field)
+	{
+		foreach ($header_array as $key => $value) {
+			if (strcasecmp($header_field, $key) == 0) {
+				return trim($value);
+			}
+		}
+	}
+
 }
 ?>
