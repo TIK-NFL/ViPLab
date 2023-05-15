@@ -1,4 +1,8 @@
 <?php
+
+use Monolog\Handler\NullHandler;
+use Monolog\Logger;
+
 include_once "./Modules/TestQuestionPool/classes/class.ilQuestionsPlugin.php";
 
 /**
@@ -13,6 +17,9 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 	const CNAME = 'TestQuestionPool';
 	const SLOT_ID = 'qst';
 	const PNAME = 'assViPLab';
+
+    const QUESTION_TYPE = "assViPLab";
+
 	private static $instance = null;
 	
 	/**
@@ -28,8 +35,12 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 			return self::$instance;
 		}
 		
-		include_once './Services/Component/classes/class.ilPluginAdmin.php';
-		return self::$instance = ilPluginAdmin::getPluginObject(self::CTYPE, self::CNAME, self::SLOT_ID, self::PNAME);
+        global $DIC;
+
+        $component_factory = $DIC['component.factory'];
+        $instance = $component_factory->getPlugin('assviplab');
+
+        return self::$instance = $instance;
 	}
 	
 	/**
@@ -64,7 +75,7 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 				$result = $connector->getPoints($event['id']);
 				if ($result instanceof ilECSResult)
 				{
-					ilLoggerFactory::getLogger('viplab')->debug($result->getPlainResultString());
+					ilLoggerFactory::getLogger('viplab')->debug($result->getResult());
 					$this->updateQuestionPoints($result);
 					return true;
 				}
@@ -111,17 +122,17 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 		}
 	}
 	
-	public function getPluginName()
+	public function getPluginName(): string
 	{
 		return self::PNAME;
 	}
 	
 	public function getQuestionType()
 	{
-		return "assViPLab";
+		return ilassViPLabPlugin::QUESTION_TYPE;
 	}
 	
-	public function getQuestionTypeTranslation()
+	public function getQuestionTypeTranslation(): string
 	{
 		return $this->txt('viplab_qst_type');
 	}
@@ -129,14 +140,9 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 	/**
 	 * Init auto load
 	 */
-	protected function init()
+	protected function init(): void
 	{
 		$this->initAutoLoad();
-		// set configured log level
-		foreach (ilLoggerFactory::getLogger('viplab')->getLogger()->getHandlers() as $handler)
-		{
-			$handler->setLevel(ilViPLabSettings::getInstance()->getLogLevel());
-		}
 	}
 	
 	/**
@@ -169,5 +175,15 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 			return;
 		}
 	}
+
+    protected function getClassesDirectory() : string
+    {
+        return $this->getDirectory() . "/classes";
+    }
+
+    public function includeClass($a_class_file_name)
+    {
+        include_once($this->getClassesDirectory() . "/" . $a_class_file_name);
+    }
+
 }
-?>

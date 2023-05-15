@@ -51,7 +51,8 @@ class assViPLab extends assQuestion
 	private $vip_exercise_id = 0;
 	private $vip_auto_scoring = true;
 
-	
+	private $vip_result_storage = '';
+
 	private $plugin;
 
 	/**
@@ -82,7 +83,7 @@ class assViPLab extends assQuestion
 	/**
 	 * @return ilassViPLabPlugin The plugin object
 	 */
-	public function getPlugin() 
+	public function getPlugin()
 	{
 		return $this->plugin;
 	}
@@ -186,7 +187,7 @@ class assViPLab extends assQuestion
 	 * @return boolean True, if the single choice question is complete for use, otherwise false
 	 * @access public
 	 */
-	function isComplete()
+	function isComplete(): bool
 	{
 		if (($this->title) and ($this->author) and ($this->question) and ($this->getMaximumPoints() > 0))
 		{
@@ -203,7 +204,7 @@ class assViPLab extends assQuestion
 	*
 	* @access public
 	*/
-	function saveToDb($original_id = "")
+	function saveToDb($original_id = -1): void
 	{
 		global $ilDB;
 
@@ -239,7 +240,7 @@ class assViPLab extends assQuestion
 	* @param integer $question_id A unique key which defines the multiple choice test in the database
 	* @access public
 	*/
-	function loadFromDb($question_id)
+	function loadFromDb($question_id): void
 	{
 		global $ilDB;
 
@@ -251,19 +252,19 @@ class assViPLab extends assQuestion
 		{
 			$data = $ilDB->fetchAssoc($result);
 			$this->setId($question_id);
-			$this->setTitle($data["title"]);
-			$this->setComment($data["description"]);
-			$this->setSuggestedSolution($data["solution_hint"]);
+			$this->setTitle($data["title"] ?? "");
+			$this->setComment($data["description"] ?? "");
+			$this->setSuggestedSolution($data["solution_hint"] ?? "");
 			$this->setOriginalId($data["original_id"]);
-			$this->setObjId($data["obj_fi"]);
-			$this->setAuthor($data["author"]);
-			$this->setOwner($data["owner"]);
-			$this->setPoints($data["points"]);
+			$this->setObjId($data["obj_fi"] ?? 0);
+			$this->setAuthor($data["author"] ?? "");
+			$this->setOwner($data["owner"] ?? -1);
+			$this->setPoints($data["points"] ?? 0);
 
 			include_once("./Services/RTE/classes/class.ilRTE.php");
-			$this->setQuestion(ilRTE::_replaceMediaObjectImageSrc($data["question_text"], 1));
+			$this->setQuestion(ilRTE::_replaceMediaObjectImageSrc($data["question_text"] ?? "", 1));
 			
-			$this->setEstimatedWorkingTimeFromDurationString($data["working_time"]);
+			$this->setEstimatedWorkingTimeFromDurationString($data["working_time"] ?? "");
 
 			// load additional data
 			$result = $ilDB->queryF("SELECT * FROM " . $this->getAdditionalTableName() . " WHERE question_fi = %s",
@@ -295,12 +296,12 @@ class assViPLab extends assQuestion
 	 *
 	 * @access public
 	 */
-	public function duplicate($for_test = true, $title = "", $author = "", $owner = "", $a_test_obj_id = null)
+	public function duplicate($for_test = true, $title = "", $author = "", $owner = "", $a_test_obj_id = null): int
 	{
 		if ($this->id <= 0)
 		{
 			// The question has not been saved. It cannot be duplicated
-			return;
+			return -1;
 		}
 		// duplicate the question in database
 		$this_id = $this->getId();
@@ -429,7 +430,7 @@ class assViPLab extends assQuestion
 	* @access public
 	* @see $points
 	*/
-	function getMaximumPoints()
+	function getMaximumPoints(): float
 	{
 		return $this->points;
 	}
@@ -481,7 +482,7 @@ class assViPLab extends assQuestion
 	 * @access public
 	 * @see $answers
 	 */
-	public function saveWorkingData($active_id, $pass = NULL, $authorized = true)
+	public function saveWorkingData($active_id, $pass = NULL, $authorized = true): bool
 	{
 		global $ilDB;
 		
@@ -590,7 +591,7 @@ class assViPLab extends assQuestion
 	 * @return integer The question type of the question
 	 * @access public
 	 */
-	function getQuestionType()
+	function getQuestionType(): string
 	{
 		return $this->getPlugin()->getQuestionType();
 	}
@@ -627,7 +628,7 @@ class assViPLab extends assQuestion
 	 * @param integer $question_id The question id which should be deleted in the answers table
 	 * @access public
 	 */
-	public function deleteAnswers($question_id)
+	public function deleteAnswers($question_id): void
 	{
 	}
 
@@ -635,7 +636,7 @@ class assViPLab extends assQuestion
 	* Collects all text in the question which could contain media objects
 	* which were created with the Rich Text Editor
 	*/
-	function getRTETextWithMediaObjects()
+	function getRTETextWithMediaObjects(): string
 	{
 		$text = parent::getRTETextWithMediaObjects();
 		return $text;
@@ -649,9 +650,9 @@ class assViPLab extends assQuestion
 	 * @param object $active_id    Active id of the participant
 	 * @param object $pass         Test pass
 	 */
-	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass)
+	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass): int
 	{
-		parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
+		return parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
 	}
 	
 	/**
@@ -667,12 +668,12 @@ class assViPLab extends assQuestion
 	* @param array $import_mapping An array containing references to included ILIAS objects
 	* @access public
 	*/
-	function fromXML(&$item, &$questionpool_id, &$tst_id, &$tst_object, &$question_counter, &$import_mapping, array $solutionhints = [])
+	public function fromXML($item, int $questionpool_id, ?int $tst_id, &$tst_object, int &$question_counter, array $import_mapping, array &$solutionhints = []): array
 	{
 		$this->getPlugin()->includeClass("./import/qti12/class." . $this->getQuestionType() . "Import.php");
 		$classname = $this->getQuestionType() . "Import";
 		$import = new $classname($this);
-		$import->fromXML($item, $questionpool_id, $tst_id, $tst_object, $question_counter, $import_mapping);
+		$import_mapping = $import->fromXML($item, $questionpool_id, $tst_id, $tst_object, $question_counter, $import_mapping);
 
 		foreach ($solutionhints as $hint) {
 			$h = new ilAssQuestionHint();
@@ -682,6 +683,7 @@ class assViPLab extends assQuestion
 			$h->setText($hint['txt']);
 			$h->save();
 		}
+		return $import_mapping;
 	}
 	
 	/**
@@ -691,7 +693,7 @@ class assViPLab extends assQuestion
 	* @return string The QTI xml representation of the question
 	* @access public
 	*/
-	function toXML($a_include_header = true, $a_include_binary = true, $a_shuffle = false, $test_output = false, $force_image_references = false)
+	function toXML($a_include_header = true, $a_include_binary = true, $a_shuffle = false, $test_output = false, $force_image_references = false): string
 	{
 		$this->getPlugin()->includeClass("./export/qti12/class." . $this->getQuestionType() . "Export.php");
 		$classname = $this->getQuestionType() . "Export";
@@ -1004,7 +1006,7 @@ class assViPLab extends assQuestion
 			}
 			else
 			{
-				ilUtil::sendFailure('Cannot assign subparticipant.');
+				$this->tpl->setOnScreenMessage('failure', 'Cannot assign subparticipant.');
 				return false;
 			}
 			
@@ -1036,7 +1038,7 @@ class assViPLab extends assQuestion
 	 * @param 	int 		$pass
 	 * @return 	array		['authorized' => bool, 'intermediate' => bool]
 	 */
-	public function lookupForExistingSolutions($activeId, $pass)
+	public function lookupForExistingSolutions($activeId, $pass): array
 	{
 		global $ilDB;
 		
@@ -1045,4 +1047,3 @@ class assViPLab extends assQuestion
 		return $state;
 	}
 }
-?>

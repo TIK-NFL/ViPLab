@@ -26,7 +26,7 @@ class assViPLabImport extends assQuestionImport
     * @param array $import_mapping An array containing references to included ILIAS objects
     * @access public
     */
-    public function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, &$import_mapping)
+    public function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, $import_mapping): array
     {
         global $DIC;
         $ilUser = $DIC['ilUser'];
@@ -187,5 +187,7 @@ class assViPLabImport extends assQuestionImport
         } else {
             $import_mapping[$item->getIdent()] = array("pool" => $this->object->getId(), "test" => 0);
         }
+
+        return $import_mapping;
     }
 }

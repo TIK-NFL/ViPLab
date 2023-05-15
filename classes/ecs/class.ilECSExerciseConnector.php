@@ -65,7 +65,7 @@ class ilECSExerciseConnector extends ilECSConnector
 			}
 			ilLoggerFactory::getLogger('viplab')->debug('... got HTTP 201 (created)');
 
-			$eid =  self::_fetchEContentIdFromHeader($this->curl->getResponseHeaderArray());
+			$eid =  ilViPLabUtil::fetchEContentIdFromHeader($this->curl->getResponseHeaderArray());
 			
 			// store new ressource
 			$ressource = new ilECSViPLabRessource();
@@ -104,10 +104,12 @@ class ilECSExerciseConnector extends ilECSConnector
 	 	try 
 	 	{
 	 		$this->prepareConnection();
-	 		$this->curl->setOpt(CURLOPT_CUSTOMREQUEST,'DELETE');
+            $this->curl->setOpt(CURLOPT_CUSTOMREQUEST, 'DELETE');
+            $this->curl->setOpt(CURLOPT_FAILONERROR, true);
 			$res = $this->call();
+
 			return new ilECSResult($res);
-	 	}
+		}
 	 	catch(ilCurlConnectionException $exc)
 	 	{
 	 		throw new ilECSConnectorException('Error calling ECS service: '.$exc->getMessage());
@@ -120,7 +122,7 @@ class ilECSExerciseConnector extends ilECSConnector
 	 * @param string $a_value
 	 * @deprecated
 	 */
-	public function addHeader($a_name,$a_value)
+	public function addHeader($a_name,$a_value): void
 	{
 		if(is_array($a_value))
 		{
@@ -134,4 +136,3 @@ class ilECSExerciseConnector extends ilECSConnector
 	}
 	
 }
-?>

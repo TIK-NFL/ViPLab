@@ -103,8 +103,10 @@ class ilECSSubParticipantConnector extends ilECSConnector
 	 	try 
 	 	{
 	 		$this->prepareConnection();
-	 		$this->curl->setOpt(CURLOPT_CUSTOMREQUEST,'DELETE');
+            $this->curl->setOpt(CURLOPT_CUSTOMREQUEST, 'DELETE');
+			$this->curl->setOpt(CURLOPT_FAILONERROR, true);
 			$res = $this->call();
+
 			return new ilECSResult($res);
 	 	}
 	 	catch(ilCurlConnectionException $exc)
@@ -144,4 +146,3 @@ class ilECSSubParticipantConnector extends ilECSConnector
 	}
 
 }
-?>

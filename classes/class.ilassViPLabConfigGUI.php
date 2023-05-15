@@ -9,14 +9,24 @@ include_once './Services/Component/classes/class.ilPluginConfigGUI.php';
  * General settings for vip lab plugin
  *
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
+ *
+ * @ilctrl_iscalledby ilassViPLabConfigGUI: ilObjComponentSettingsGUI
  */
 class ilassViPLabConfigGUI extends ilPluginConfigGUI
 {
 
+	public ilGlobalPageTemplate $tpl;
+
+	public function __construct()
+	{
+		global $DIC;
+		$this->tpl = $DIC['tpl'];
+	}
+
 	/**
 	 * Handles all commmands, default is "configure"
 	 */
-	public function performCommand($cmd)
+	public function performCommand($cmd): void
 	{
 		global $ilTabs;
 		
@@ -63,7 +73,7 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		
 		// ecs servers
 		include_once './Services/WebServices/ECS/classes/class.ilECSServerSettings.php';
-		$servers = ilECSServerSettings::getInstance()->getServers();
+		$servers = ilECSServerSettings::getInstance()->getServers(ilECSServerSettings::ACTIVE_SERVER);
 		$options = array();
 		$options[0] = $GLOBALS['lng']->txt('select_one');
 		foreach ($servers as $server)
@@ -164,7 +174,7 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 		}
 		catch (ilECSConnectorException $e)
 		{
-			ilUtil::sendFailure('Read from ecs server failed with message: ' . $e);
+			$this->tpl->setOnScreenMessage('failure', 'Read from ecs server failed with message: ' . $e);
 		}
 		
 		$options = array();
@@ -214,15 +224,14 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 			}
 			$settings->setLanguages($enabled_langs);
 			$settings->update();
-			
-			ilUtil::sendSuccess($GLOBALS['lng']->txt('settings_saved'), TRUE);
+
+			$this->tpl->setOnScreenMessage('success', $GLOBALS['lng']->txt('settings_saved'), true);
 			$GLOBALS['ilCtrl']->redirect($this, 'configure');
 			return TRUE;
 		}
 		
-		ilUtil::sendFailure($GLOBALS['lng']->txt('err_check_input'), TRUE);
+		$this->tpl->setOnScreenMessage('failure', $GLOBALS['lng']->txt('err_check_input'), true);
 		$GLOBALS['ilCtrl']->redirect($this, 'configure');
 		return TRUE;
 	}
 }
-?>

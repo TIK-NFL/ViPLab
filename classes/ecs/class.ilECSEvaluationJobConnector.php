@@ -73,7 +73,7 @@ class ilECSEvaluationJobConnector extends ilECSConnector
 			}
 			ilLoggerFactory::getLogger('viplab')->debug('... got HTTP 201 (created)');
 
-			$eid =  self::_fetchEContentIdFromHeader($this->curl->getResponseHeaderArray());
+			$eid =  ilViPLabUtil::fetchEContentIdFromHeader($this->curl->getResponseHeaderArray());
 			return $eid;
 	 	}
 	 	catch(ilCurlConnectionException $exc)
@@ -90,7 +90,7 @@ class ilECSEvaluationJobConnector extends ilECSConnector
 	 * @param string $a_value
 	 * @deprecated
 	 */
-	public function addHeader($a_name,$a_value)
+	public function addHeader($a_name,$a_value): void
 	{
 		if(is_array($a_value))
 		{
@@ -104,4 +104,3 @@ class ilECSEvaluationJobConnector extends ilECSConnector
 	}
 	
 }
-?>

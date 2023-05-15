@@ -64,7 +64,7 @@ class ilECSPointsConnector extends ilECSConnector
 	 * @param string $a_value
 	 * @deprecated
 	 */
-	public function addHeader($a_name,$a_value)
+	public function addHeader($a_name,$a_value): void
 	{
 		if(is_array($a_value))
 		{
@@ -78,4 +78,3 @@ class ilECSPointsConnector extends ilECSConnector
 	}
 	
 }
-?>

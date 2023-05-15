@@ -104,14 +104,14 @@ class ilViPLabEditorFormGUI extends ilFormPropertyGUI
 	 *
 	 * @return boolean Input ok, true/false
 	 */
-	function checkInput()
+	function checkInput(): bool
 	{
 		global $DIC;
 		
 		if ($this->getPostVar())
 		{
-			$_POST[$this->getPostVar()] = ilUtil::stripSlashes($_POST[$this->getPostVar()]);
-			if ($this->getRequired() && trim($_POST[$this->getPostVar()]) == "")
+			$postVar = ilUtil::stripSlashes($_POST[$this->getPostVar()] ?: '');
+			if ($this->getRequired() && trim($postVar) == "")
 			{
 				$this->setAlert($DIC->language()->txt("msg_input_is_required"));
 				return false;

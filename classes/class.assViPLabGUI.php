@@ -34,7 +34,7 @@ class assViPLabGUI extends assQuestionGUI
 	/**
 	 * Get question tabs
 	 */
-	public function setQuestionTabs()
+	public function setQuestionTabs(): void
 	{
 		global $ilAccess, $ilTabs;
 		
@@ -237,7 +237,7 @@ class assViPLabGUI extends assQuestionGUI
 		if(!$form->checkInput())
 		{
 			$form->setValuesByPost();
-			ilUtil::sendFailure($DIC->language()->txt('err_check_input'), TRUE);
+			$this->tpl->setOnScreenMessage('failure', $this->lng->txt('err_check_input'), true);
 			$this->editQuestion($form);
 			return TRUE;
 		}
@@ -276,7 +276,11 @@ class assViPLabGUI extends assQuestionGUI
 		$sol_arr = $this->getViPLabQuestion()->getUserSolutionPreferingIntermediate($a_active_id, $a_pass);
 		
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
-		if (ilObjTest::_getUsePreviousAnswers($a_active_id, true) && count($sol_arr) == 0)
+
+		// Replaces the former static call ilObjTest::_getUsePreviousAnswers.
+		$tmpObjTest = new ilObjTest();
+
+		if ($tmpObjTest->isPreviousSolutionReuseEnabled($a_active_id) && count($sol_arr) == 0)
 		{
 			$a_pass = $a_pass ? $a_pass - 1 : $a_pass;
 			$sol_arr = $this->getViPLabQuestion()->getSolutionValues($a_active_id, $a_pass, true);
@@ -345,7 +349,7 @@ class assViPLabGUI extends assQuestionGUI
 	/**
 	 * Save question
 	 */
-	public function save()
+	public function save(): void
 	{
 		$this->getViPLabQuestion()->deleteSubParticipant();
 		$this->getViPLabQuestion()->deleteExercise();
@@ -358,7 +362,7 @@ class assViPLabGUI extends assQuestionGUI
 		}
 		else
 		{
-			ilUtil::sendFailure($this->lng->txt('err_check_input'));
+			$this->tpl->setOnScreenMessage('failure', $this->lng->txt('err_check_input'));
 			$form->setValuesByPost();
 			$this->editQuestion($form);
 		}		
@@ -367,7 +371,7 @@ class assViPLabGUI extends assQuestionGUI
 	/**
 	 * Save and return
 	 */
-	public function saveReturn()
+	public function saveReturn(): void
 	{
 		$this->getViPLabQuestion()->deleteSubParticipant();
 		$this->getViPLabQuestion()->deleteExercise();
@@ -380,7 +384,7 @@ class assViPLabGUI extends assQuestionGUI
 		}
 		else
 		{
-			ilUtil::sendFailure($this->lng->txt('err_check_input'));
+			$this->tpl->setOnScreenMessage('failure', $this->lng->txt('err_check_input'));
 			$form->setValuesByPost();
 			$this->editQuestion($form);
 		}
@@ -422,7 +426,7 @@ class assViPLabGUI extends assQuestionGUI
 	 * @param boolean $always
 	 * @return int
 	 */
-	public function writePostData($always = false)
+	public function writePostData($always = false): int
 	{
 		return 0;
 	}
@@ -546,11 +550,15 @@ class assViPLabGUI extends assQuestionGUI
 	 * @param boolean $show_question_text
 	 * @return string The solution output of the question as HTML code
 	 */
-	public function getSolutionOutput($active_id, $pass = NULL, $graphicalOutput = FALSE, $result_output = FALSE, $show_question_only = TRUE, $show_feedback = FALSE, $show_correct_solution = FALSE, $show_manual_scoring = FALSE, $show_question_text = TRUE)
+	public function getSolutionOutput($active_id, $pass = NULL, $graphicalOutput = FALSE, $result_output = FALSE, $show_question_only = TRUE, $show_feedback = FALSE, $show_correct_solution = FALSE, $show_manual_scoring = FALSE, $show_question_text = TRUE): string
 	{
 		if ($show_correct_solution) {
 			return $this->getGenericFeedbackOutputForCorrectSolution();
 		}
+
+		// In case that the active_id is an empty string...
+		// E.g., passed by Modules/Test/classes/class.ilObjTestGUI.php:printobject() for print views.
+		$active_id = $active_id ?: 0;
 
 		// In case of feedbacks, post reviews, etc. show the readonly editor to the student.
 		// Otherwise, use the solution output for teachers containing more options.
@@ -635,10 +643,9 @@ class assViPLabGUI extends assQuestionGUI
 		return $solutionoutput;
 	}
 
-	public function getSpecificFeedbackOutput($userSolution)
+	public function getSpecificFeedbackOutput($userSolution): string
 	{
+		return "";
 	}
 
-
 }
-?>
