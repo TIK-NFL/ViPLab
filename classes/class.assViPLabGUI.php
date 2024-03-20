@@ -49,7 +49,7 @@ class assViPLabGUI extends assQuestionGUI
 			$this->ctrl->setParameterByClass(strtolower($classname), "q_id", $_GET["q_id"]);
 		}
 
-		if ($_GET["q_id"])
+		if (isset($_GET["q_id"]))
 		{
 			if ($ilAccess->checkAccess('write', '',$_GET["ref_id"]))
 			{
@@ -102,7 +102,7 @@ class assViPLabGUI extends assQuestionGUI
         $this->addTab_QuestionHints($ilTabs);
 
 		// Assessment of questions sub menu entry
-		if ($_GET["q_id"])
+		if (isset($_GET["q_id"]))
 		{
 			$ilTabs->addTarget("statistics",
 				$this->ctrl->getLinkTargetByClass($classname, "assessment"),
