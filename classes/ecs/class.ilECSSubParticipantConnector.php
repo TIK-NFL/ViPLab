@@ -126,7 +126,8 @@ class ilECSSubParticipantConnector extends ilECSConnector
 		$ecs_result = new ilECSResult($this->curl->getResponseBody());
 
 		$location = $this->getResponseHeaderFieldValue($this->curl->getResponseHeaderArray(), 'Location');
-		$id = end(explode('/', $location));
+        $location_segments = explode('/', $location);
+        $id = end($location_segments);
 		
 		ilLoggerFactory::getLogger('viplab')->debug('Location:' . $location);
 		ilLoggerFactory::getLogger('viplab')->debug('id:' . $id);

@@ -288,8 +288,7 @@ class assViPLabGUI extends assQuestionGUI
 		
 		ilLoggerFactory::getLogger('viplab')->debug(print_r($sol_arr, true));
 		
-		$sol = (string) $sol_arr[0]['value2'];
-		
+		$sol = isset($sol_arr[0]['value2']) ? (string) $sol_arr[0]['value2'] : '';
 		if (strlen($sol) || $a_force_empty_solution)
 		{
 			// create the solution on ecs

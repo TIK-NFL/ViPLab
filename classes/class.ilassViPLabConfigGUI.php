@@ -161,37 +161,28 @@ class ilassViPLabConfigGUI extends ilPluginConfigGUI
 	 * Read available mids
 	 *
 	 * @param ilViPLabSettings $settings
-	 * @return string[string]
+	 * @return array[string]
 	 */
 	protected function readAvailabeMids(ilViPLabSettings $settings, $a_only_self = false)
 	{
-		try
-		{
+        $options = array();
+        $options[0] = $GLOBALS['lng']->txt('select_one');
+
+		try {
 			include_once './Services/WebServices/ECS/classes/class.ilECSCommunityReader.php';
 			$reader = ilECSCommunityReader::getInstanceByServerId($settings->getECSServerId());
 			$participants = $reader->getParticipants();
-		
-		}
-		catch (ilECSConnectorException $e)
-		{
+
+            foreach ($participants as $mid => $part) {
+                if (($part->isSelf() && !$a_only_self) || (!$part->isSelf() && $a_only_self)) {
+                    continue;
+                }
+                $options[$mid] = $part->getParticipantName() . ': ' . $this->getPluginObject()->txt('ecs_mid') . ' ' . $mid;
+            }
+		} catch (ilECSConnectorException $e) {
 			$this->tpl->setOnScreenMessage('failure', 'Read from ecs server failed with message: ' . $e);
 		}
-		
-		$options = array();
-		$options[0] = $GLOBALS['lng']->txt('select_one');
-		
-		foreach ((array) $participants as $mid => $part)
-		{
-			if ($part->isSelf() && !$a_only_self)
-			{
-				continue;
-			}
-			if (!$part->isSelf() && $a_only_self)
-			{
-				continue;
-			}
-			$options[$mid] = $part->getParticipantName() . ': ' . $this->getPluginObject()->txt('ecs_mid') . ' ' . $mid;
-		}
+
 		return $options;
 	}
 

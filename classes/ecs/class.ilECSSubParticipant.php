@@ -91,24 +91,23 @@ class ilECSSubParticipant
 	{
 		if(is_object($this->getJson()))
 		{
-			$this->realm = $this->getJson()->realm;
-			$this->description = $this->getJson()->description;
-			$this->communities = (array) $this->getJson()->communities;
-			$this->dns = $this->getJson()->dns;
+			$this->realm = $this->getJson()->realm ?? $this->realm;
+			$this->description = $this->getJson()->description ?? $this->description;
+			$this->communities = isset($this->getJson()->communities) ? (array) $this->getJson()->communities : $this->communities;
+			$this->dns = $this->getJson()->dns ?? $this->dns;
 			
 			$counter = 0;
-			
-			ilLoggerFactory::getLogger('viplab')->debug('Auth ids: ' . $this->getJson()->auth_ids);
+			ilLoggerFactory::getLogger('viplab')->debug('Auth ids: ' . json_encode($this->getJson()->auth_ids));
 			foreach((array) $this->getJson()->auth_ids as $auth_id)
 			{
 				$this->auth_ids[$counter]['desc'] = (string) $auth_id->desc;
 				$this->auth_ids[$counter]['auth_id'] = (string) $auth_id->auth_id;
 			}
 			
-			$this->community_selfrouting = $this->getJson()->community_selfrouting;
-			$this->name = $this->getJson()->name;
-			$this->events = $this->getJson()->events;
-			$this->email = $this->getJson()->email;
+			$this->community_selfrouting = $this->getJson()->community_selfrouting ?? $this->community_selfrouting;
+			$this->name = $this->getJson()->name ?? $this->name;
+			$this->events = $this->getJson()->events ?? $this->events;
+			$this->email = $this->getJson()->email ?? $this->email;
 
 			foreach((array) $this->getJson()->memberships as $membership)
 			{
