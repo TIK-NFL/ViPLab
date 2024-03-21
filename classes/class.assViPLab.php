@@ -264,8 +264,6 @@ class assViPLab extends assQuestion
 			include_once("./Services/RTE/classes/class.ilRTE.php");
 			$this->setQuestion(ilRTE::_replaceMediaObjectImageSrc($data["question_text"] ?? "", 1));
 			
-			$this->setEstimatedWorkingTimeFromDurationString($data["working_time"] ?? "");
-
 			// load additional data
 			$result = $ilDB->queryF("SELECT * FROM " . $this->getAdditionalTableName() . " WHERE question_fi = %s",
 				array('integer'),

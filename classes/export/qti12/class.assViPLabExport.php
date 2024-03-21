@@ -47,9 +47,6 @@ class assViPLabExport extends assQuestionExport
         // QTI metadata
 
         $a_xml_writer->xmlElement("qticomment", null, $this->object->getComment());
-        $workingtime = $this->object->getEstimatedWorkingTime();
-        $duration = sprintf("P0Y0M0DT%dH%dM%dS", $workingtime["h"], $workingtime["m"], $workingtime["s"]);
-        $a_xml_writer->xmlElement("duration", null, $duration);
 
         $a_xml_writer->xmlStartTag("itemmetadata");
         $a_xml_writer->xmlStartTag("qtimetadata");

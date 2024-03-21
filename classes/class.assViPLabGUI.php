@@ -410,13 +410,7 @@ class assViPLabGUI extends assQuestionGUI
 		$vibLabQuestion->setVipAutoScoring($form->getInput('auto_scoring'));
 		
 		ilLoggerFactory::getLogger('viplab')->debug(print_r($form->getInput('vipexercise'), true));
-		
-		$vibLabQuestion->setEstimatedWorkingTime(
-			$_POST["Estimated"]["hh"],
-			$_POST["Estimated"]["mm"],
-			$_POST["Estimated"]["ss"]
-		);
-		
+
 		$vibLabQuestion->setVipLang($form->getInput('language'));
 		return TRUE;
 	}

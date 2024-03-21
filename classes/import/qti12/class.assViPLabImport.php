@@ -128,7 +128,6 @@ class assViPLabImport extends assQuestionImport
         $this->object->setOwner($ilUser->getId());
         $this->object->setQuestion($this->object->QTIMaterialToString($item->getQuestiontext()));
         $this->object->setObjId($questionpool_id);
-        $this->object->setEstimatedWorkingTime($duration["h"], $duration["m"], $duration["s"]);
         $this->object->setAdditionalContentEditingMode($this->fetchAdditionalContentEditingModeInformation($item));
         $this->object->saveToDb();
 
