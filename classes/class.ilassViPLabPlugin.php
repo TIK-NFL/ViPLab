@@ -62,26 +62,26 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 	 */
 	public function handleEcsEvent($a_event_type, $a_event)
 	{
+        if ($a_event_type != 'newEcsEvent' || !isset($a_event['event'])) {
+            return false;
+        }
+
 		$event = $a_event['event'];
-		
+
 		ilLoggerFactory::getLogger('viplab')->debug('Handling new event: ' . $event['type']);
 		
 		
-		if ($event['type'] == 'points')
-		{
-			try
-			{
+		if ($event['type'] == 'points') {
+			try {
 				$connector = new ilECSPointsConnector(ilViPLabSettings::getInstance()->getECSServer());
 				$result = $connector->getPoints($event['id']);
-				if ($result instanceof ilECSResult)
-				{
+
+				if ($result instanceof ilECSResult) {
                     ilLoggerFactory::getLogger('viplab')->dump($result->getResult(), ilLogLevel::DEBUG);
 					$this->updateQuestionPoints($result);
 					return true;
 				}
-			}
-			catch (Exception $ex)
-			{
+			} catch (Exception $ex) {
 				ilLoggerFactory::getLogger('viplab')->warning($ex->getMessage());
 			}
 		}
