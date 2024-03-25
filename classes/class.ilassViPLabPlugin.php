@@ -75,7 +75,7 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 				$result = $connector->getPoints($event['id']);
 				if ($result instanceof ilECSResult)
 				{
-					ilLoggerFactory::getLogger('viplab')->debug($result->getResult());
+                    ilLoggerFactory::getLogger('viplab')->dump($result->getResult(), ilLogLevel::DEBUG);
 					$this->updateQuestionPoints($result);
 					return true;
 				}
