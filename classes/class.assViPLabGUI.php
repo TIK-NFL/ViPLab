@@ -394,23 +394,26 @@ class assViPLabGUI extends assQuestionGUI
 	 */
 	public function writeVipLabQuestionFromForm(ilPropertyFormGUI $form)
 	{
-		$vibLabQuestion = $this->getViPLabQuestion();
-		$vibLabQuestion->setTitle($form->getInput('title'));
-		$vibLabQuestion->setComment($form->getInput('comment'));
-		$vibLabQuestion->setAuthor($form->getInput('author'));
-		$vibLabQuestion->setQuestion($form->getInput('question'));
-		$vibLabQuestion->setPoints($form->getInput('points'));
-		$vibLabQuestion->setVipExercise($form->getInput('vipexercise'));
-		
+		$viplabQuestion = $this->getViPLabQuestion();
+		$viplabQuestion->setTitle($form->getInput('title'));
+		$viplabQuestion->setComment($form->getInput('comment'));
+		$viplabQuestion->setAuthor($form->getInput('author'));
+		$viplabQuestion->setQuestion($form->getInput('question'));
+		$viplabQuestion->setPoints($form->getInput('points'));
+
+		// ilHiddenInputGUI->getInput eventually calls replacements in ilFormPropertyGUI->stripSlashesAddSpaceFallback
+		// which modify the ViPLab exercise code. Hence, the POST variable is used instead of $form->getInput('vipexercise').
+		$viplabQuestion->setVipExercise($_POST['vipexercise']);
+
 		$evaluation = ilViPLabUtil::extractJsonFromCustomZip($form->getInput('vipevaluation'));
-		$vibLabQuestion->setVipEvaluation($evaluation);
-		
-		$vibLabQuestion->setVipResultStorage($form->getInput('result_storing'));
-		$vibLabQuestion->setVipAutoScoring($form->getInput('auto_scoring'));
-		
+		$viplabQuestion->setVipEvaluation($evaluation);
+
+		$viplabQuestion->setVipResultStorage($form->getInput('result_storing'));
+		$viplabQuestion->setVipAutoScoring($form->getInput('auto_scoring'));
+
 		ilLoggerFactory::getLogger('viplab')->debug(print_r($form->getInput('vipexercise'), true));
 
-		$vibLabQuestion->setVipLang($form->getInput('language'));
+		$viplabQuestion->setVipLang($form->getInput('language'));
 		return TRUE;
 	}
 	
