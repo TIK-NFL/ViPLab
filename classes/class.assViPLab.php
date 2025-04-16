@@ -293,7 +293,7 @@ class assViPLab extends assQuestion
 	 *
 	 * @access public
 	 */
-	public function duplicate($for_test = true, $title = "", $author = "", $owner = "", $a_test_obj_id = null): int
+	public function duplicate($for_test = true, $title = "", $author = "", $owner = "", $a_test_obj_id = 0): int
 	{
 		if ($this->id <= 0)
 		{
@@ -397,7 +397,6 @@ class assViPLab extends assQuestion
 		// duplicate the question in database
 		$clone = $this;
 		include_once ("./Modules/TestQuestionPool/classes/class.assQuestion.php");
-		$original_id = $this->getOriginalId();
 		$clone->id = -1;
 		$source_questionpool = $this->getObjId();
 		$clone->setObjId($target_questionpool);
@@ -407,13 +406,17 @@ class assViPLab extends assQuestion
 		}
 		$clone->saveToDb();
 
-		// copy question page content
-		$clone->copyPageOfQuestion($original_id);
-		// copy XHTML media objects
-		$clone->copyXHTMLMediaObjectsOfQuestion($original_id);
-		// duplicate the generic feedback
-		// TODO figure out new way for feedback copy in question pools
-		//$clone->duplicateGenericFeedback($original_id);
+        $original_id = $this->getOriginalId();
+
+        if (!is_null($original_id)) {
+            // copy question page content
+            $clone->copyPageOfQuestion($original_id);
+            // copy XHTML media objects
+            $clone->copyXHTMLMediaObjectsOfQuestion($original_id);
+            // duplicate the generic feedback
+            // TODO figure out new way for feedback copy in question pools
+            //$clone->duplicateGenericFeedback($original_id);
+        }
 
 		return $clone->id;
 	}
