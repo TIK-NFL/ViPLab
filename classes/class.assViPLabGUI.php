@@ -424,9 +424,11 @@ class assViPLabGUI extends assQuestionGUI
 
 		// ilHiddenInputGUI->getInput eventually calls replacements in ilFormPropertyGUI->stripSlashesAddSpaceFallback
 		// which modify the ViPLab exercise code. Hence, the POST variable is used instead of $form->getInput('vipexercise').
+		// The same applies to the 'vipevaluation' input field.
+
 		$viplabQuestion->setVipExercise($_POST['vipexercise']);
 
-		$evaluation = ilViPLabUtil::extractJsonFromCustomZip($form->getInput('vipevaluation'));
+		$evaluation = ilViPLabUtil::extractJsonFromCustomZip($_POST['vipevaluation']);
 		$viplabQuestion->setVipEvaluation($evaluation);
 
 		$viplabQuestion->setVipResultStorage($form->getInput('result_storing'));
