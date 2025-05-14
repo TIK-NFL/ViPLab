@@ -801,30 +801,25 @@ class assViPLab extends assQuestion
 	public function createResult($a_active_id, $a_pass): int
     {
 		$result_arr = $this->getSolutionValues($a_active_id, $a_pass);
-		if(isset($result_arr[1]))
-		{
-			$result_string = $result_arr[1]['value2'];
-		}
-		try 
-		{
-			$scon = new ilECSVipResultConnector(
-				ilViPLabSettings::getInstance()->getECSServer()
-			);
-			
-			$new_id = $scon->addResult($result_string,
-					array(
-						ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
-						$this->getVipSubId()
-					)
-			);
-			ilLoggerFactory::getLogger('viplab')->debug('Received new result id ' . $new_id);
-			return $new_id;
-		}
-		catch (ilECSConnectorException $exception)
-		{
-			ilLoggerFactory::getLogger('viplab')->error('Creating result failed with message: '. $exception);
-            throw $exception;
-		}
+
+		if (sizeof($result_arr) > 1) {
+            try {
+                $scon = new ilECSVipResultConnector(ilViPLabSettings::getInstance()->getECSServer());
+                $result_string = $result_arr[1]['value2'];
+                $new_id = $scon->addResult($result_string, array(
+                            ilViPLabSettings::getInstance()->getLanguageMid($this->getVipLang()),
+                            $this->getVipSubId()
+                    )
+                );
+                ilLoggerFactory::getLogger('viplab')->debug('Received new result id ' . $new_id);
+                return $new_id;
+
+            } catch (ilECSConnectorException $exception) {
+                ilLoggerFactory::getLogger('viplab')->error('Creating result failed with message: '. $exception);
+                throw $exception;
+            }
+        }
+        return 0;
 	}
 
     /**
