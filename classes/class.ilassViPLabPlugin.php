@@ -111,6 +111,14 @@ class ilassViPLabPlugin extends ilQuestionsPlugin
 		{
             $viplabQuestion = new assViPLab();
             $viplabQuestion->loadFromDb($qid);
+
+            if ($viplabQuestion->getId() < 0) {
+                ilLoggerFactory::getLogger('viplab')->warning('ViPLab question with qid ' . $qid .
+                    ' not present within the database. Thus, unable to save scoring result.');
+                ilLoggerFactory::getLogger('viplab')->dump($points, ilLogLevel::WARNING);
+                return;
+            }
+
 			assQuestion::_setReachedPoints($active_id, $qid, $received_points, $viplabQuestion->getPoints(), $pass, true, true);
 			// todo lp status wrapper
 		}
