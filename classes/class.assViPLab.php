@@ -521,14 +521,10 @@ class assViPLab extends assQuestion
 			)
 		);
 		
-		// create evaluation job 
-		$this->createEvaluationJob(
-			$solution,
-			$active_id,
-			$pass
-		);
-		
-		
+		// create evaluation job
+		// disabled due to the discontinuation of ViPLab
+		//$this->createEvaluationJob($solution, $active_id, $pass);
+
 		if($this->getVipResultStorage() or 1)
 		{
 			$result = ilUtil::stripSlashes($_POST['vipresult']);
